@@ -1,0 +1,23 @@
+# Untitled notebook
+
+## Section
+
+```elixir
+import IEx.Helpers
+recompile()
+alias Mailseek.Client.Gmail
+
+token = "ya29.test"
+history_id = "6257072"
+# {:ok, %{history_id: history_id}} = Gmail.set_watch(token)
+
+# dbg(history_id)
+
+Gmail.get_new_messages(token, history_id)
+
+
+message_id = "1957288b16e1403a"
+
+Gmail.get_message_by_id(token, message_id)
+|> Enum.reject(fn x -> x.body.size == 0 end)
+```
