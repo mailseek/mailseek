@@ -36,7 +36,7 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
 
     {:ok, %{from: from, to: to, subject: subject}} =
       Repo.transaction(fn ->
-        # Archive message
+        # Archive message inside a transaction to ensure that if we can't archive it, we don't create a message in our db and will retry later
         {:ok, _} = Gmail.archive_message(token, message_id)
 
         Messages.create_message(%{
