@@ -32,6 +32,10 @@ config :mailseek,
        :google_client_secret,
        System.get_env("GOOGLE_CLIENT_SECRET") || raise("GOOGLE_CLIENT_SECRET is not set")
 
+config :langchain,
+       :deepseek_api_key,
+       System.get_env("DEEPSEEK_API_KEY") || raise("DEEPSEEK_API_KEY is not set")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

@@ -1,7 +1,6 @@
 defmodule Mailseek.Client.Gmail do
   alias GoogleApi.Gmail.V1.Api.Users
   alias GoogleApi.Gmail.V1.Connection
-  # Mailseek.Client.Gmail.list_messages()
 
   @topic "projects/mailseek/topics/mailseek-gmail-notifications"
 

@@ -4,6 +4,7 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
   alias Mailseek.Client.Gmail
   alias Mailseek.Gmail.TokenManager
   alias Mailseek.Gmail.Messages
+  alias Mailseek.Jobs.CategorizeEmail
   require Logger
 
   @impl Oban.Worker
@@ -24,7 +25,15 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
       end)
       |> Enum.into(%{})
 
-    %{} =
+    plain_text =
+      message.parts
+      |> Enum.find(fn part -> part.mime_type == "text/plain" end)
+      |> case do
+        nil -> ""
+        part -> Gmail.decode_base64(part.body.data)
+      end
+
+    %{from: from, to: to, subject: subject} =
       Messages.create_message(%{
         message_id: message_id,
         user_id: user_id,
@@ -34,7 +43,18 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
         status: "new"
       })
 
-    # TODO: Schedule AI processing here
+    CategorizeEmail.new(%{
+      "provider" => "gmail",
+      "email" => %{
+        "from" => from,
+        "to" => to,
+        "subject" => subject,
+        "body" => plain_text
+      },
+      "message_id" => message_id,
+      "user_id" => user_id
+    })
+    |> Oban.insert!()
 
     Logger.info("Processed message #{message_id} for user #{user_id}")
 

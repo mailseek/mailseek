@@ -63,7 +63,8 @@ defmodule Mailseek.MixProject do
       {:oban, "~> 2.19"},
       {:igniter, "~> 0.5", only: [:dev]},
       {:oban_web, "~> 2.11"},
-      {:httpoison, "~> 2.0"}
+      {:httpoison, "~> 2.0"},
+      {:langchain, "~> 0.3.1"}
     ]
   end
 
