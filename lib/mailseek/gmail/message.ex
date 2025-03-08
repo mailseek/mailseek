@@ -8,9 +8,14 @@ defmodule Mailseek.Gmail.Message do
     field :to, :string
     field :message_id, :string
     field :user_id, :binary_id
-    # field :category_id, :binary_id
     field :summary, :string
     field :status, :string
+    field :reason, :string
+    field :model, :string
+    field :temperature, :float
+    field :need_action, :boolean
+
+    belongs_to :category, Mailseek.User.UserCategory, foreign_key: :category_id
 
     timestamps()
   end
@@ -23,7 +28,6 @@ defmodule Mailseek.Gmail.Message do
       :to,
       :message_id,
       :user_id,
-      # :category_id,
       :summary,
       :status
     ])
@@ -35,9 +39,13 @@ defmodule Mailseek.Gmail.Message do
     message
     |> cast(attrs, [
       :subject,
-      # :category_id,
+      :category_id,
       :summary,
-      :status
+      :status,
+      :reason,
+      :model,
+      :temperature,
+      :need_action
     ])
     |> validate_required([:subject, :from, :to, :message_id, :user_id, :status])
     |> unique_constraint([:message_id, :user_id])

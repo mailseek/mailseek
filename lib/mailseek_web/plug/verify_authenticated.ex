@@ -6,7 +6,7 @@ defmodule MailseekWeb.Plug.VerifyAuthenticated do
 
   def call(conn, _opts) do
     with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
-         {:ok, claims} <- verify_token(token) |> dbg() do
+         {:ok, claims} <- verify_token(token) do
       assign(conn, :current_user, claims)
     else
       _ -> unauthorized_response(conn)

@@ -11,6 +11,8 @@ defmodule Mailseek.User.Gmail do
 
     field :user_id, :binary_id
 
+    has_many :categories, Mailseek.User.UserCategory, foreign_key: :user_id
+
     timestamps()
   end
 

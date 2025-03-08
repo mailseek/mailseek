@@ -4,8 +4,6 @@ defmodule MailseekWeb.EmailsChannel do
 
   @impl true
   def join("emails:all", payload, socket) do
-    dbg(payload)
-
     if authorized?(payload) do
       {:ok, %{categories: []}, socket}
     else
@@ -20,7 +18,7 @@ defmodule MailseekWeb.EmailsChannel do
   end
 
   defp authorized?(%{"token" => token}) do
-    case AuthToken.verify_user_socket_token(token) |> dbg() do
+    case AuthToken.verify_user_socket_token(token) do
       {:ok, _claims} -> true
       {:error, _} -> false
     end

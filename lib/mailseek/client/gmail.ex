@@ -19,7 +19,6 @@ defmodule Mailseek.Client.Gmail do
 
       {:error, reason} ->
         IO.inspect(reason, label: "Error")
-        dbg(reason)
         :error
     end
   end
@@ -65,21 +64,14 @@ defmodule Mailseek.Client.Gmail do
 
     {:ok, %{messages: messages}} = Users.gmail_users_messages_list(conn, "me")
 
-    ids =
-      messages
-      |> Enum.take(10)
-      |> Enum.map(fn x ->
-        x.id
-      end)
-      |> tap(fn x_ids ->
-        dbg(x_ids)
-      end)
-
-    ids
+    messages
+    |> Enum.take(10)
+    |> Enum.map(fn x ->
+      x.id
+    end)
     |> Enum.take(2)
     |> Enum.map(fn id ->
       {:ok, msg} = Users.gmail_users_messages_get(conn, "me", id)
-      dbg("Message id: #{id}")
 
       msg.payload
       |> parse_message_part()
@@ -95,7 +87,6 @@ defmodule Mailseek.Client.Gmail do
          partId: part_id
        }) do
     parts = parts || []
-    dbg({"Parsed message part", part_id, mime_type, "has more included parts:", length(parts)})
 
     [
       %{

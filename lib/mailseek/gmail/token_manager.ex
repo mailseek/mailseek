@@ -34,8 +34,6 @@ defmodule Mailseek.Gmail.TokenManager do
         %{access_token: token, expires_at: expires_at, refresh_token: refresh_token} =
           Users.get_user(user_id)
 
-        dbg("Fetched from db user #{user_id}")
-
         {:reply, {:ok, token},
          Map.put(state, user_id, %{
            access_token: token,
@@ -157,7 +155,6 @@ defmodule Mailseek.Gmail.TokenManager do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         data =
           Jason.decode!(body)
-          |> dbg()
 
         {:ok, data["access_token"], data["expires_in"]}
 

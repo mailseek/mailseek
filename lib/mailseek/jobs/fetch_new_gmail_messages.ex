@@ -34,8 +34,6 @@ defmodule Mailseek.Jobs.FetchNewGmailMessages do
       messages_added: messages_added
     } = Gmail.get_new_messages(token, history_id)
 
-    dbg(messages_added)
-
     Repo.transaction(fn ->
       :ok =
         Enum.each(messages_added, fn message ->

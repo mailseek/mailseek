@@ -28,7 +28,7 @@ defmodule Mailseek.LLM.Model do
       endpoint: DeepSeek.endpoint(),
       api_key: DeepSeek.api_key(),
       stream: false,
-      json_response: Map.get(params, :json_response, false) |> dbg()
+      json_response: Map.get(params, :json_response, false)
     })
   end
 
