@@ -2,6 +2,23 @@ defmodule Mailseek.Gmail.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder,
+           only: [
+             :id,
+             :subject,
+             :from,
+             :to,
+             :message_id,
+             :summary,
+             :status,
+             :reason,
+             :model,
+             :temperature,
+             :need_action,
+             :category_id,
+             :inserted_at,
+             :updated_at
+           ]}
   schema "gmail_messages" do
     field :subject, :string
     field :from, :string

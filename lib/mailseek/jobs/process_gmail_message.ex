@@ -49,17 +49,23 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
         })
       end)
 
-    CategorizeEmail.new(%{
-      "provider" => "gmail",
-      "email" => %{
-        "from" => from,
-        "to" => to,
-        "subject" => subject,
-        "body" => plain_text
+    CategorizeEmail.new(
+      %{
+        "provider" => "gmail",
+        "email" => %{
+          "from" => from,
+          "to" => to,
+          "subject" => subject,
+          "body" => plain_text
+        },
+        "message_id" => message_id,
+        "user_id" => user_id
       },
-      "message_id" => message_id,
-      "user_id" => user_id
-    })
+      meta: %{
+        type: "categorize_gmail_message",
+        user_id: user_id
+      }
+    )
     |> Oban.insert!()
 
     Logger.info("Processed message #{message_id} for user #{user_id}")

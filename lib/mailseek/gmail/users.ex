@@ -4,6 +4,16 @@ defmodule Mailseek.Gmail.Users do
   alias Mailseek.User.GmailUserConnection
   alias Mailseek.Repo
 
+  def get_connected_accounts(user_id) do
+    user_id
+    |> get_user()
+    |> Repo.preload(connected_accounts: :to_user)
+    |> Map.fetch!(:connected_accounts)
+    |> Enum.map(fn connection ->
+      Map.fetch!(connection, :to_user)
+    end)
+  end
+
   def get_user(user_id) do
     Repo.get_by!(GmailUser, user_id: user_id)
   end
@@ -44,9 +54,12 @@ defmodule Mailseek.Gmail.Users do
     |> Map.fetch!(:categories)
   end
 
-  def add_category(attrs) do
+  def upsert_category(attrs) do
     %UserCategory{}
     |> UserCategory.changeset(attrs)
-    |> Repo.insert!()
+    |> Repo.insert!(
+      on_conflict: {:replace, [:definition, :updated_at]},
+      conflict_target: [:user_id, :name]
+    )
   end
 end

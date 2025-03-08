@@ -3,6 +3,25 @@ defmodule MailseekWeb.GmailController do
   alias Mailseek.Gmail.Users
   alias Mailseek.Gmail
 
+  def connected_accounts(conn = %{assigns: %{current_user: %{}}}, %{"user_id" => user_id}) do
+    json(conn, %{connected_accounts: Users.get_connected_accounts(user_id)})
+  end
+
+  def list_categories(conn = %{assigns: %{current_user: %{}}}, %{"user_id" => user_id}) do
+    json(conn, %{categories: Users.get_categories(user_id)})
+  end
+
+  def create_category(
+        conn = %{assigns: %{current_user: %{}}},
+        %{"user_id" => user_id, "name" => _name, "definition" => _definition} = params
+      ) do
+    %{} = user = Users.get_user(user_id)
+
+    %{} = Users.upsert_category(Map.put(params, "user_id", user.id))
+
+    json(conn, %{categories: Users.get_categories(user_id)})
+  end
+
   def create_user(conn = %{assigns: %{current_user: %{}}}, %{
         "user_id" => user_id,
         "email" => email,

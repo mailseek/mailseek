@@ -4,6 +4,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
   alias Mailseek.LLM
   alias Mailseek.Gmail.Messages
   alias Mailseek.Gmail.Users
+  alias Mailseek.Notifications
   require Logger
 
   @model "deepseek-chat"
@@ -53,18 +54,25 @@ defmodule Mailseek.Jobs.CategorizeEmail do
           category.id
       end
 
-    message_id
-    |> Messages.get_message()
-    |> Messages.update_message(%{
-      category_id: category_id,
-      summary: Map.fetch!(response, "summary"),
-      need_action: Map.fetch!(response, "need_action"),
-      reason: Map.fetch!(response, "reason"),
-      status: "processed",
-      model: @model,
-      temperature: @temperature
-    })
+    message =
+      message_id
+      |> Messages.get_message()
+      |> Messages.update_message(%{
+        category_id: category_id,
+        summary: Map.fetch!(response, "summary"),
+        need_action: Map.fetch!(response, "need_action"),
+        reason: Map.fetch!(response, "reason"),
+        status: "processed",
+        model: @model,
+        temperature: @temperature
+      })
 
-    :ok
+    Notifications.notify("emails:all", {
+      :email_processed,
+      %{
+        message: message
+      },
+      user_id
+    })
   end
 end

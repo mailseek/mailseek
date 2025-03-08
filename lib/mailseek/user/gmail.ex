@@ -3,6 +3,7 @@ defmodule Mailseek.User.Gmail do
 
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :email, :user_id]}
   schema "gmail_users" do
     field :access_token, :string
     field :refresh_token, :string
@@ -12,7 +13,7 @@ defmodule Mailseek.User.Gmail do
     field :user_id, :binary_id
 
     has_many :categories, Mailseek.User.UserCategory, foreign_key: :user_id
-
+    has_many :connected_accounts, Mailseek.User.GmailUserConnection, foreign_key: :from_user_id
     timestamps()
   end
 

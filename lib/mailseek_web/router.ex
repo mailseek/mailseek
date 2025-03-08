@@ -27,9 +27,18 @@ defmodule MailseekWeb.Router do
     get "/", PageController, :home
   end
 
+  scope "/api/messages", MailseekWeb do
+    pipe_through :api_authenticated
+
+    get "/", MessageController, :index
+  end
+
   scope "/api/users", MailseekWeb do
     pipe_through :api_authenticated
 
+    get "/categories", GmailController, :list_categories
+    post "/categories", GmailController, :create_category
+    get "/connected_accounts", GmailController, :connected_accounts
     post "/google", GmailController, :create_user
     post "/google/connect", GmailController, :connect
   end

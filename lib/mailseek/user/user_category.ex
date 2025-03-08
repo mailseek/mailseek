@@ -2,6 +2,7 @@ defmodule Mailseek.User.UserCategory do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :name, :definition]}
   schema "users_categories" do
     field :name, :string
     field :definition, :string

@@ -4,23 +4,33 @@ defmodule MailseekWeb.EmailsChannel do
 
   @impl true
   def join("emails:all", payload, socket) do
-    if authorized?(payload) do
-      {:ok, %{categories: []}, socket}
-    else
-      {:error, %{reason: "unauthorized"}}
+    case authorized?(payload) do
+      {:ok, user_id} ->
+        {:ok, %{}, assign(socket, :user_id, user_id)}
+
+      :error ->
+        {:error, %{reason: "unauthorized"}}
     end
   end
 
   @impl true
-  def handle_info({:logs, category, logs}, socket) do
-    broadcast(socket, "logs", %{category: category, logs: logs})
+  def handle_info(
+        {:email_processed, payload, user_id},
+        socket = %{assigns: %{user_id: socket_user_id}}
+      )
+      when socket_user_id == user_id do
+    broadcast(socket, "email_processed", %{payload: payload, user_id: user_id})
+    {:noreply, socket}
+  end
+
+  def handle_info({:email_processed, _, _}, socket) do
     {:noreply, socket}
   end
 
   defp authorized?(%{"token" => token}) do
     case AuthToken.verify_user_socket_token(token) do
-      {:ok, _claims} -> true
-      {:error, _} -> false
+      {:ok, %{"user_id" => user_id}} -> {:ok, user_id}
+      {:error, _} -> :error
     end
   end
 
