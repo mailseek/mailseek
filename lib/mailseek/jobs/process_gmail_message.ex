@@ -5,6 +5,7 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
   alias Mailseek.Gmail.TokenManager
   alias Mailseek.Gmail.Messages
   alias Mailseek.Jobs.CategorizeEmail
+  alias Mailseek.Repo
   require Logger
 
   @impl Oban.Worker
@@ -33,15 +34,20 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
         part -> Gmail.decode_base64(part.body.data)
       end
 
-    %{from: from, to: to, subject: subject} =
-      Messages.create_message(%{
-        message_id: message_id,
-        user_id: user_id,
-        subject: Map.fetch!(headers_map, "Subject"),
-        from: Map.fetch!(headers_map, "From"),
-        to: Map.fetch!(headers_map, "To"),
-        status: "new"
-      })
+    {:ok, %{from: from, to: to, subject: subject}} =
+      Repo.transaction(fn ->
+        # Archive message
+        {:ok, _} = Gmail.archive_message(token, message_id)
+
+        Messages.create_message(%{
+          message_id: message_id,
+          user_id: user_id,
+          subject: Map.fetch!(headers_map, "Subject"),
+          from: Map.fetch!(headers_map, "From"),
+          to: Map.fetch!(headers_map, "To"),
+          status: "new"
+        })
+      end)
 
     CategorizeEmail.new(%{
       "provider" => "gmail",

@@ -23,6 +23,24 @@ defmodule Mailseek.Client.Gmail do
     end
   end
 
+  def archive_message(token, message_id) do
+    conn = Connection.new(token)
+
+    body = %{
+      # Moves email out of Inbox (archives it)
+      removeLabelIds: ["INBOX"]
+    }
+
+    case Users.gmail_users_messages_modify(conn, "me", message_id, body: body) do
+      {:ok, response} ->
+        {:ok, response}
+
+      {:error, reason} ->
+        IO.inspect(reason, label: "Error")
+        :error
+    end
+  end
+
   def get_message_by_id(token, id) do
     conn = Connection.new(token)
 
