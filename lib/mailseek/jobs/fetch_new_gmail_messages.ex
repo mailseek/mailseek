@@ -24,6 +24,7 @@ defmodule Mailseek.Jobs.FetchNewGmailMessages do
   defp do_perform(%{"provider" => "gmail", "user_id" => user_id}) do
     {:ok, token} = TokenManager.get_access_token(user_id)
     %{history_id: history_id} = Users.get_user(user_id)
+
     if is_nil(history_id) do
       raise "No history id found for user #{user_id}"
     end
@@ -36,15 +37,17 @@ defmodule Mailseek.Jobs.FetchNewGmailMessages do
     dbg(messages_added)
 
     Repo.transaction(fn ->
-      :ok = Enum.each(messages_added, fn message ->
-        Logger.info("Adding message #{message.id} to user #{user_id}")
-        ProcessGmailMessage.new(%{
-          "provider" => "gmail",
-          "user_id" => user_id,
-          "message_id" => message.id
-        })
-        |> Oban.insert!()
-      end)
+      :ok =
+        Enum.each(messages_added, fn message ->
+          Logger.info("Adding message #{message.id} to user #{user_id}")
+
+          ProcessGmailMessage.new(%{
+            "provider" => "gmail",
+            "user_id" => user_id,
+            "message_id" => message.id
+          })
+          |> Oban.insert!()
+        end)
     end)
 
     %{} =

@@ -5,6 +5,7 @@ defmodule MailseekWeb.EmailsChannel do
   @impl true
   def join("emails:all", payload, socket) do
     dbg(payload)
+
     if authorized?(payload) do
       {:ok, %{categories: []}, socket}
     else

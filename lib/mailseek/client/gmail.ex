@@ -10,7 +10,8 @@ defmodule Mailseek.Client.Gmail do
 
     body = %{
       topicName: @topic,
-      labelIds: ["INBOX"]  # Only watch new inbox messages
+      # Only watch new inbox messages
+      labelIds: ["INBOX"]
     }
 
     case Users.gmail_users_watch(conn, "me", body: body) do
@@ -32,26 +33,31 @@ defmodule Mailseek.Client.Gmail do
     %{
       id: id,
       parts: msg.payload |> parse_message_part() |> Enum.reject(fn x -> x.body.size == 0 end),
-      headers: msg.payload.headers |> Enum.filter(fn x -> x.name in ["Subject", "From", "To", "Date", "Return-Path"] end) |> Enum.map(fn x ->
-        %{
-          name: x.name,
-          value: x.value
-        }
-      end)
+      headers:
+        msg.payload.headers
+        |> Enum.filter(fn x -> x.name in ["Subject", "From", "To", "Date", "Return-Path"] end)
+        |> Enum.map(fn x ->
+          %{
+            name: x.name,
+            value: x.value
+          }
+        end)
     }
   end
 
   def get_new_messages(token, history_id) do
     conn = Connection.new(token)
 
-    {:ok, %{history: history, historyId: new_history_id}} = Users.gmail_users_history_list(conn, "me", startHistoryId: history_id)
+    {:ok, %{history: history, historyId: new_history_id}} =
+      Users.gmail_users_history_list(conn, "me", startHistoryId: history_id)
 
     %{
       new_history_id: new_history_id,
-      messages_added: Enum.flat_map(history || [], fn
-        %{messagesAdded: nil} -> []
-        %{messagesAdded: messages} -> Enum.map(messages, fn x -> x.message end)
-      end)
+      messages_added:
+        Enum.flat_map(history || [], fn
+          %{messagesAdded: nil} -> []
+          %{messagesAdded: messages} -> Enum.map(messages, fn x -> x.message end)
+        end)
     }
   end
 
@@ -75,6 +81,7 @@ defmodule Mailseek.Client.Gmail do
     |> Enum.map(fn id ->
       {:ok, msg} = Users.gmail_users_messages_get(conn, "me", id)
       dbg("Message id: #{id}")
+
       msg.payload
       |> parse_message_part()
     end)
@@ -82,14 +89,23 @@ defmodule Mailseek.Client.Gmail do
     :ok
   end
 
-  defp parse_message_part(%{body: %{data: _data} = body, parts: parts, mimeType: mime_type, partId: part_id}) do
+  defp parse_message_part(%{
+         body: %{data: _data} = body,
+         parts: parts,
+         mimeType: mime_type,
+         partId: part_id
+       }) do
     parts = parts || []
     dbg({"Parsed message part", part_id, mime_type, "has more included parts:", length(parts)})
-    [%{
-      body: body,
-      mime_type: mime_type,
-      part_id: part_id
-    } | Enum.flat_map(parts, &parse_message_part/1)]
+
+    [
+      %{
+        body: body,
+        mime_type: mime_type,
+        part_id: part_id
+      }
+      | Enum.flat_map(parts, &parse_message_part/1)
+    ]
   end
 
   def decode_base64(encoded) do

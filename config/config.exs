@@ -13,7 +13,7 @@ config :mailseek, Oban,
   queues: [gmail_message: 50, ai_processing: 50],
   plugins: [
     {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7},
-    {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(15)},
+    {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(15)}
   ],
   repo: Mailseek.Repo
 

@@ -7,7 +7,9 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
   require Logger
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"provider" => "gmail", "message_id" => message_id, "user_id" => user_id}}) do
+  def perform(%Oban.Job{
+        args: %{"provider" => "gmail", "message_id" => message_id, "user_id" => user_id}
+      }) do
     do_perform(user_id, message_id)
   end
 
@@ -22,14 +24,15 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
       end)
       |> Enum.into(%{})
 
-    %{} = Messages.create_message(%{
-      message_id: message_id,
-      user_id: user_id,
-      subject: Map.fetch!(headers_map, "Subject"),
-      from: Map.fetch!(headers_map, "From"),
-      to: Map.fetch!(headers_map, "To"),
-      status: "new"
-    })
+    %{} =
+      Messages.create_message(%{
+        message_id: message_id,
+        user_id: user_id,
+        subject: Map.fetch!(headers_map, "Subject"),
+        from: Map.fetch!(headers_map, "From"),
+        to: Map.fetch!(headers_map, "To"),
+        status: "new"
+      })
 
     # TODO: Schedule AI processing here
 

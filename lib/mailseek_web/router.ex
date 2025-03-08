@@ -30,7 +30,7 @@ defmodule MailseekWeb.Router do
   scope "/" do
     pipe_through :browser
 
-    oban_dashboard "/oban"
+    oban_dashboard("/oban")
   end
 
   # Other scopes may use custom stacks.
