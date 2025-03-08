@@ -27,6 +27,10 @@ defmodule MailseekWeb.EmailsChannel do
     {:noreply, socket}
   end
 
+  def handle_info(x, socket) do
+    {:noreply, socket}
+  end
+
   defp authorized?(%{"token" => token}) do
     case AuthToken.verify_user_socket_token(token) do
       {:ok, %{"user_id" => user_id}} -> {:ok, user_id}

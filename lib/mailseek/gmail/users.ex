@@ -4,6 +4,8 @@ defmodule Mailseek.Gmail.Users do
   alias Mailseek.User.GmailUserConnection
   alias Mailseek.Repo
 
+  import Ecto.Query
+
   def get_connected_accounts(user_id) do
     user_id
     |> get_user()
@@ -41,6 +43,12 @@ defmodule Mailseek.Gmail.Users do
     end
   end
 
+  def update_user(user_id, attrs) when is_binary(user_id) do
+    user_id
+    |> get_user()
+    |> update_user(attrs)
+  end
+
   def update_user(user, attrs) do
     user
     |> GmailUser.update_changeset(attrs)
@@ -54,6 +62,14 @@ defmodule Mailseek.Gmail.Users do
     |> Map.fetch!(:categories)
   end
 
+  def categories_for_account(user_id) do
+    user_id
+    |> get_user()
+    |> get_primary_account()
+    |> Repo.preload(:categories)
+    |> Map.fetch!(:categories)
+  end
+
   def upsert_category(attrs) do
     %UserCategory{}
     |> UserCategory.changeset(attrs)
@@ -61,5 +77,15 @@ defmodule Mailseek.Gmail.Users do
       on_conflict: {:replace, [:definition, :updated_at]},
       conflict_target: [:user_id, :name]
     )
+  end
+
+  def get_primary_account(%GmailUser{id: id} = self_user) do
+    from(c in GmailUserConnection, where: c.to_user_id == ^id)
+    |> Repo.all()
+    |> List.first()
+    |> case do
+      nil -> self_user
+      %{from_user_id: from_user_id} -> Repo.get!(GmailUser, from_user_id)
+    end
   end
 end

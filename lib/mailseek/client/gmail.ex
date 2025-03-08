@@ -44,21 +44,28 @@ defmodule Mailseek.Client.Gmail do
   def get_message_by_id(token, id) do
     conn = Connection.new(token)
 
-    {:ok, msg} = Users.gmail_users_messages_get(conn, "me", id)
+    case Users.gmail_users_messages_get(conn, "me", id) do
+      {:ok, msg} ->
+        {:ok, %{
+          id: id,
+          parts: msg.payload |> parse_message_part() |> Enum.reject(fn x -> x.body.size == 0 end),
+          headers:
+            msg.payload.headers
+            |> Enum.filter(fn x -> x.name in ["Subject", "From", "To", "Date", "Return-Path"] end)
+            |> Enum.map(fn x ->
+              %{
+                name: x.name,
+                value: x.value
+              }
+            end)
+        }}
 
-    %{
-      id: id,
-      parts: msg.payload |> parse_message_part() |> Enum.reject(fn x -> x.body.size == 0 end),
-      headers:
-        msg.payload.headers
-        |> Enum.filter(fn x -> x.name in ["Subject", "From", "To", "Date", "Return-Path"] end)
-        |> Enum.map(fn x ->
-          %{
-            name: x.name,
-            value: x.value
-          }
-        end)
-    }
+      {:error, %Tesla.Env{status: 404}} ->
+        {:error, :not_found}
+
+      {:error, %Tesla.Env{status: 401}} ->
+        {:error, :unauthorized}
+    end
   end
 
   def get_new_messages(token, history_id) do
@@ -72,7 +79,12 @@ defmodule Mailseek.Client.Gmail do
       messages_added:
         Enum.flat_map(history || [], fn
           %{messagesAdded: nil} -> []
-          %{messagesAdded: messages} -> Enum.map(messages, fn x -> x.message end)
+          %{messagesAdded: messages} ->
+            messages
+            |> Enum.reject(fn x ->
+              Enum.any?(["SENT", "DRAFT"], fn label -> label in x.message.labelIds end)
+            end)
+            |> Enum.map(fn x -> x.message end)
         end)
     }
   end
@@ -115,6 +127,8 @@ defmodule Mailseek.Client.Gmail do
       | Enum.flat_map(parts, &parse_message_part/1)
     ]
   end
+
+  def decode_base64(nil), do: nil
 
   def decode_base64(encoded) do
     encoded

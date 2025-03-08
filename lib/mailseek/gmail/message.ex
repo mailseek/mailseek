@@ -9,6 +9,7 @@ defmodule Mailseek.Gmail.Message do
              :from,
              :to,
              :message_id,
+             :user_id,
              :summary,
              :status,
              :reason,

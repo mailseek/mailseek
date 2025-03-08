@@ -28,7 +28,12 @@ defmodule Mailseek.Jobs.CategorizeEmail do
            "body" => body
          }
        }) do
-    categories = Users.get_categories(user_id)
+    categories = Users.categories_for_account(user_id)
+
+    primary_user = %{} =
+      user_id
+      |> Users.get_user()
+      |> Users.get_primary_account()
 
     {:ok, %{response: response}} =
       LLM.process(%{
@@ -72,7 +77,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
       %{
         message: message
       },
-      user_id
+      primary_user.user_id
     })
   end
 end

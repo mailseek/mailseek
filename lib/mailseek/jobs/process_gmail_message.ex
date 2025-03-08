@@ -17,7 +17,7 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
 
   defp do_perform(user_id, message_id) do
     {:ok, token} = TokenManager.get_access_token(user_id)
-    message = %{} = Gmail.get_message_by_id(token, message_id)
+    {:ok, message = %{}} = Gmail.get_message_by_id(token, message_id)
 
     headers_map =
       message.headers
@@ -36,6 +36,7 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
 
     {:ok, %{from: from, to: to, subject: subject}} =
       Repo.transaction(fn ->
+        {:ok, token} = TokenManager.get_access_token(user_id)
         # Archive message inside a transaction to ensure that if we can't archive it, we don't create a message in our db and will retry later
         {:ok, _} = Gmail.archive_message(token, message_id)
 
