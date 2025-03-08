@@ -27,7 +27,7 @@ defmodule MailseekWeb.EmailsChannel do
     {:noreply, socket}
   end
 
-  def handle_info(x, socket) do
+  def handle_info(_x, socket) do
     {:noreply, socket}
   end
 
