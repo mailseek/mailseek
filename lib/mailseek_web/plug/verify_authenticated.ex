@@ -15,7 +15,7 @@ defmodule MailseekWeb.Plug.VerifyAuthenticated do
 
   defp verify_token(token) do
     case AuthToken.verify_user_socket_token(token) do
-      {:ok, %{"user_id" => _user_id} = data} ->
+      {:ok, %{} = data} ->
         {:ok, data}
 
       {:error, _} ->
