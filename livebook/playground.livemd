@@ -9,14 +9,15 @@ recompile()
 alias Mailseek.Repo
 alias Mailseek.User.Gmail
 
-%Gmail{}
-|> Gmail.changeset(%{
-  access_token: "ya29.",
-  refresh_token: "1//",
-  expires_at: 1741394314,
-  user_id: "ab59c2ff-6c20-4de9-ae20-251caee45849"
-})
-|> Repo.insert()
+# %Gmail{}
+# |> Gmail.changeset(%{
+#   access_token: "ya29.a0AeXRPp4nLrX89wPf1Myh9UInZOVpEkAa0Op_tFXCi15_GI9buo7rkfSpF-ZiKnnOAQuDYYpYM90TvvAQ7I8XKjHFQjEJnTbNBL8yFFXpdMl-9xCge_WuWPw2Tpr5suyq7N9SuSS0N11U9HSyEAOXE7YeOPmZH--M1HbzMTFQaCgYKAf4SARMSFQHGX2Miop_PCnTMwuIbbir1CrYXKg0175",
+#   refresh_token: "1//09icHGJAOZCbnCgYIARAAGAkSNwF-L9IrLxsQCLi6yihRaW-E3B87Lt2Lr0Zq7t8BJ-A6yOully5Q5EIQXAVXbhqAW4z2NwyTj2Y",
+#   expires_at: 1741394314,
+#   user_id: "ab59c2ff-6c20-4de9-ae20-251caee45849"
+# })
+# |> Repo.insert()
+
 ```
 
 ## Get access token for user
@@ -24,9 +25,9 @@ alias Mailseek.User.Gmail
 ```elixir
 alias Mailseek.Gmail.TokenManager
 
-user_id = "ab59c2ff-6c20-4de9-ae20-251caee45849"
+# user_id = "ab59c2ff-6c20-4de9-ae20-251caee45849"
 
-Mailseek.Gmail.initiate_user(user_id)
+# Mailseek.Gmail.initiate_user(user_id)
 
 ```
 
@@ -36,17 +37,32 @@ Mailseek.Gmail.initiate_user(user_id)
 import IEx.Helpers
 recompile()
 alias Mailseek.Client.Gmail
+alias Mailseek.Gmail.TokenManager
 
-token = "ya29."
-history_id = "6257072"
-# {:ok, %{history_id: history_id}} = Gmail.set_watch(token)
+user_id = "d015ac79-7794-4655-8032-5d941fb9c482"
 
-# dbg(history_id)
-
-Gmail.get_new_messages(token, history_id)
+{:ok, token} = TokenManager.get_access_token(user_id)
 
 
-message_id = "1957288b16e1403a"
+message_id = "19577391312ea5a5"
 
 Gmail.get_message_by_id(token, message_id)
+
+
+```
+
+## WS Debug
+
+```elixir
+user_id = "ab59c2ff-6c20-4de9-ae20-251caee45849"
+
+Mailseek.Notifications.notify("emails:all", {
+  :email_processed,
+  %{message: %{
+    id: Ecto.UUID.generate(),
+    category_id: 6,
+    subject: "123"
+  }},
+  user_id
+})
 ```
