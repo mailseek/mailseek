@@ -1,4 +1,5 @@
 import Config
+config :mailseek, Oban, testing: :manual
 
 # Configure your database
 #

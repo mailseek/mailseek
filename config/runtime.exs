@@ -21,6 +21,8 @@ if System.get_env("PHX_SERVER") do
 end
 
 config :mailseek, :socket_secret, System.get_env("SOCKET_SECRET") || raise "SOCKET_SECRET is not set"
+config :mailseek, :google_client_id, System.get_env("GOOGLE_CLIENT_ID") || raise "GOOGLE_CLIENT_ID is not set"
+config :mailseek, :google_client_secret, System.get_env("GOOGLE_CLIENT_SECRET") || raise "GOOGLE_CLIENT_SECRET is not set"
 
 if config_env() == :prod do
   database_url =

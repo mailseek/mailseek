@@ -15,7 +15,6 @@ defmodule Mailseek.Client.Gmail do
 
     case Users.gmail_users_watch(conn, "me", body: body) do
       {:ok, %{historyId: history_id, expiration: expiration}} ->
-        store_history_id("_me_", history_id) # Save this to track new emails
         {:ok, %{history_id: history_id, expiration: expiration}}
 
       {:error, reason} ->
@@ -30,8 +29,16 @@ defmodule Mailseek.Client.Gmail do
 
     {:ok, msg} = Users.gmail_users_messages_get(conn, "me", id)
 
-    msg.payload
-    |> parse_message_part()
+    %{
+      id: id,
+      parts: msg.payload |> parse_message_part() |> Enum.reject(fn x -> x.body.size == 0 end),
+      headers: msg.payload.headers |> Enum.filter(fn x -> x.name in ["Subject", "From", "To", "Date", "Return-Path"] end) |> Enum.map(fn x ->
+        %{
+          name: x.name,
+          value: x.value
+        }
+      end)
+    }
   end
 
   def get_new_messages(token, history_id) do
@@ -39,14 +46,13 @@ defmodule Mailseek.Client.Gmail do
 
     {:ok, %{history: history, historyId: new_history_id}} = Users.gmail_users_history_list(conn, "me", startHistoryId: history_id)
 
-    user_id = "me"
-
-    :ok = store_history_id(user_id, new_history_id)
-
-    Enum.flat_map(history, fn
-      %{messagesAdded: nil} -> []
-      %{messagesAdded: messages} -> Enum.map(messages, fn x -> x.message end)
-    end)
+    %{
+      new_history_id: new_history_id,
+      messages_added: Enum.flat_map(history || [], fn
+        %{messagesAdded: nil} -> []
+        %{messagesAdded: messages} -> Enum.map(messages, fn x -> x.message end)
+      end)
+    }
   end
 
   def list_messages(token) do
@@ -91,11 +97,5 @@ defmodule Mailseek.Client.Gmail do
     |> String.replace("-", "+")
     |> String.replace("_", "/")
     |> Base.decode64!()
-  end
-
-  defp store_history_id(user_id, history_id) do
-    dbg("Storing history id: #{history_id} for user: #{user_id}")
-
-    :ok
   end
 end

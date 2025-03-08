@@ -61,7 +61,9 @@ defmodule Mailseek.MixProject do
       {:google_api_gmail, "~> 0.16.0"},
       {:joken, "~> 2.6"},
       {:oban, "~> 2.19"},
-      {:igniter, "~> 0.5", only: [:dev]}
+      {:igniter, "~> 0.5", only: [:dev]},
+      {:oban_web, "~> 2.11"},
+      {:httpoison, "~> 2.0"}
     ]
   end
 

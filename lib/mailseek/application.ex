@@ -7,13 +7,17 @@ defmodule Mailseek.Application do
 
   @impl true
   def start(_type, _args) do
+    Oban.Telemetry.attach_default_logger()
+
     children = [
       MailseekWeb.Telemetry,
       Mailseek.Repo,
       {DNSCluster, query: Application.get_env(:mailseek, :dns_cluster_query) || :ignore},
+      {Oban, Application.fetch_env!(:mailseek, Oban)},
       {Phoenix.PubSub, name: Mailseek.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Mailseek.Finch},
+      Mailseek.Gmail.TokenManager,
       # Start a worker by calling: Mailseek.Worker.start_link(arg)
       # {Mailseek.Worker, arg},
       # Start to serve requests, typically the last entry

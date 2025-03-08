@@ -1,13 +1,43 @@
 # Untitled notebook
 
-## Section
+## Create user
+
+```elixir
+import IEx.Helpers
+recompile()
+
+alias Mailseek.Repo
+alias Mailseek.User.Gmail
+
+%Gmail{}
+|> Gmail.changeset(%{
+  access_token: "ya29.",
+  refresh_token: "1//",
+  expires_at: 1741394314,
+  user_id: "ab59c2ff-6c20-4de9-ae20-251caee45849"
+})
+|> Repo.insert()
+```
+
+## Get access token for user
+
+```elixir
+alias Mailseek.Gmail.TokenManager
+
+user_id = "ab59c2ff-6c20-4de9-ae20-251caee45849"
+
+Mailseek.Gmail.initiate_user(user_id)
+
+```
+
+## Get message
 
 ```elixir
 import IEx.Helpers
 recompile()
 alias Mailseek.Client.Gmail
 
-token = "ya29.test"
+token = "ya29."
 history_id = "6257072"
 # {:ok, %{history_id: history_id}} = Gmail.set_watch(token)
 
@@ -19,5 +49,4 @@ Gmail.get_new_messages(token, history_id)
 message_id = "1957288b16e1403a"
 
 Gmail.get_message_by_id(token, message_id)
-|> Enum.reject(fn x -> x.body.size == 0 end)
 ```

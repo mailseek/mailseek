@@ -7,6 +7,16 @@
 # General application configuration
 import Config
 
+config :mailseek, Oban,
+  engine: Oban.Engines.Basic,
+  notifier: Oban.Notifiers.Postgres,
+  queues: [gmail_message: 50, ai_processing: 50],
+  plugins: [
+    {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7},
+    {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(15)},
+  ],
+  repo: Mailseek.Repo
+
 config :mailseek,
   ecto_repos: [Mailseek.Repo],
   generators: [timestamp_type: :utc_datetime]

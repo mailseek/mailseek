@@ -1,6 +1,8 @@
 defmodule MailseekWeb.Router do
   use MailseekWeb, :router
 
+  import Oban.Web.Router
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -23,6 +25,12 @@ defmodule MailseekWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  scope "/" do
+    pipe_through :browser
+
+    oban_dashboard "/oban"
   end
 
   # Other scopes may use custom stacks.
