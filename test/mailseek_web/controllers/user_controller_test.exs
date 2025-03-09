@@ -61,6 +61,24 @@ defmodule MailseekWeb.UserControllerTest do
       assert length(categories) == 1
       assert hd(categories)["name"] == "New Category"
     end
+
+    test "upserts category if already exists", %{conn: conn, user: user} do
+      params = %{
+        "user_id" => user.user_id,
+        "name" => "New Category",
+        "definition" => "Test definition"
+      }
+
+      conn = post(conn, ~p"/api/users/categories", params)
+
+      conn =
+        post(conn, ~p"/api/users/categories", Map.put(params, "definition", "New definition"))
+
+      assert %{"categories" => categories} = json_response(conn, 200)
+      assert length(categories) == 1
+      assert hd(categories)["name"] == "New Category"
+      assert hd(categories)["definition"] == "New definition"
+    end
   end
 
   describe "create_user/2" do
