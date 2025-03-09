@@ -36,3 +36,8 @@ config :phoenix, :plug_init_mode, :runtime
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true
+
+config :mailseek, :gmail_client, Mailseek.MockGmailClient
+config :mailseek, :token_manager, Mailseek.MockTokenManager
+config :mailseek, :notifications, Mailseek.MockNotifications
+config :mailseek, :users, Mailseek.MockUsers

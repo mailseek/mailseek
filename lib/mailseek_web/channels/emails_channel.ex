@@ -43,5 +43,5 @@ defmodule MailseekWeb.EmailsChannel do
     end
   end
 
-  defp authorized?(_), do: false
+  defp authorized?(_), do: :error
 end

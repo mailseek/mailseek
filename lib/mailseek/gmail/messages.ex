@@ -1,13 +1,14 @@
 defmodule Mailseek.Gmail.Messages do
   alias Mailseek.Gmail.Message
   alias Mailseek.Repo
-  alias Mailseek.Client.Gmail
-  alias Mailseek.Gmail.TokenManager
   alias Mailseek.Jobs.FindUnsubscribeLink
   alias Mailseek.Jobs.DeleteGmailMessage
-  alias Mailseek.Gmail.Users
-  alias Mailseek.Notifications
   import Ecto.Query
+
+  @gmail_client Application.compile_env(:mailseek, :gmail_client, Mailseek.Client.Gmail)
+  @token_manager Application.compile_env(:mailseek, :token_manager, Mailseek.Gmail.TokenManager)
+  @notifications Application.compile_env(:mailseek, :notifications, Mailseek.Notifications)
+  @users Application.compile_env(:mailseek, :users, Mailseek.Gmail.Users)
 
   def get_message(message_id) do
     Repo.get_by!(Message, message_id: message_id)
@@ -16,22 +17,22 @@ defmodule Mailseek.Gmail.Messages do
   def load_message(message_id, user_id) do
     %{} = get_message_for_user(message_id, user_id)
 
-    {:ok, token} = TokenManager.get_access_token(user_id)
+    {:ok, token} = @token_manager.get_access_token(user_id)
 
-    {:ok, %{id: id, parts: parts}} = Gmail.get_message_by_id(token, message_id)
+    {:ok, %{id: id, parts: parts}} = @gmail_client.get_message_by_id(token, message_id)
 
     html =
       Enum.find(parts, fn part -> part.mime_type == "text/html" end)
       |> case do
         nil -> nil
-        %{body: %{data: data}} -> Gmail.decode_base64(data)
+        %{body: %{data: data}} -> @gmail_client.decode_base64(data)
       end
 
     text =
       Enum.find(parts, fn part -> part.mime_type == "text/plain" end)
       |> case do
         nil -> nil
-        %{body: %{data: data}} -> Gmail.decode_base64(data)
+        %{body: %{data: data}} -> @gmail_client.decode_base64(data)
       end
 
     %{
@@ -42,7 +43,7 @@ defmodule Mailseek.Gmail.Messages do
   end
 
   def delete_messages(user_id, message_ids) do
-    user_ids = Users.related_user_ids(user_id)
+    user_ids = @users.related_user_ids(user_id)
 
     msgs =
       Repo.all(
@@ -68,7 +69,7 @@ defmodule Mailseek.Gmail.Messages do
   end
 
   def unsubscribe_messages(user_id, message_ids) do
-    user_ids = Users.related_user_ids(user_id)
+    user_ids = @users.related_user_ids(user_id)
 
     msgs =
       Repo.all(
@@ -111,10 +112,10 @@ defmodule Mailseek.Gmail.Messages do
 
     primary_user =
       msg.user_id
-      |> Users.get_user()
-      |> Users.get_primary_account()
+      |> @users.get_user()
+      |> @users.get_primary_account()
 
-    Notifications.notify("emails:all", {
+    @notifications.notify("emails:all", {
       :email_updated,
       %{
         message: msg

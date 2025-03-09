@@ -70,7 +70,9 @@ defmodule Mailseek.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:poison, "~> 3.0"},
       {:sweet_xml, "~> 0.6.6"},
-      {:hackney, "~> 1.9"}
+      {:hackney, "~> 1.9"},
+      {:mox, "~> 1.2"},
+      {:ex_machina, "~> 2.8"}
     ]
   end
 

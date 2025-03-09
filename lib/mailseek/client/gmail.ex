@@ -3,7 +3,9 @@ defmodule Mailseek.Client.Gmail do
   alias GoogleApi.Gmail.V1.Connection
   require Logger
   @topic "projects/mailseek/topics/mailseek-gmail-notifications"
+  @behaviour Mailseek.Client.GmailBehaviour
 
+  @impl true
   def set_watch(token) do
     conn = Connection.new(token)
 
@@ -22,6 +24,7 @@ defmodule Mailseek.Client.Gmail do
     end
   end
 
+  @impl true
   def trash_message(token, message_id) do
     conn = Connection.new(token)
 
@@ -38,6 +41,7 @@ defmodule Mailseek.Client.Gmail do
     end
   end
 
+  @impl true
   def archive_message(token, message_id) do
     conn = Connection.new(token)
 
@@ -56,6 +60,7 @@ defmodule Mailseek.Client.Gmail do
     end
   end
 
+  @impl true
   def get_message_by_id(token, id) do
     conn = Connection.new(token)
 
@@ -137,10 +142,10 @@ defmodule Mailseek.Client.Gmail do
     ]
   end
 
+  @impl true
   def decode_base64(nil), do: nil
-
-  def decode_base64(encoded) do
-    encoded
+  def decode_base64(data) do
+    data
     |> String.replace("-", "+")
     |> String.replace("_", "/")
     |> Base.decode64!()

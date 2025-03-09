@@ -1,27 +1,38 @@
 defmodule MailseekWeb.EmailsChannelTest do
   use MailseekWeb.ChannelCase
+  import Mailseek.Factory
+  alias MailseekWeb.AuthToken
 
   setup do
-    {:ok, _, socket} =
-      MailseekWeb.UserSocket
-      |> socket("user_id", %{some: :assign})
-      |> subscribe_and_join(MailseekWeb.EmailsChannel, "emails:lobby")
+    # Create a test user
+    user = insert(:user)
 
-    %{socket: socket}
+    # Return context
+    %{user: user}
   end
 
-  test "ping replies with status ok", %{socket: socket} do
-    ref = push(socket, "ping", %{"hello" => "there"})
-    assert_reply ref, :ok, %{"hello" => "there"}
-  end
+  describe "join" do
+    test "joins the channel successfully with user_id", %{user: user} do
+      {:ok, token, _} = AuthToken.sign(%{
+        "user_id" => user.user_id,
+      })
+      {:ok, _, socket} =
+        MailseekWeb.UserSocket
+        |> socket("user_id", %{user_id: user.user_id})
+        |> subscribe_and_join(MailseekWeb.EmailsChannel, "emails:all", %{
+          "token" => token
+        })
 
-  test "shout broadcasts to emails:lobby", %{socket: socket} do
-    push(socket, "shout", %{"hello" => "all"})
-    assert_broadcast "shout", %{"hello" => "all"}
-  end
+      assert socket.assigns.user_id == user.user_id
+    end
 
-  test "broadcasts are pushed to the client", %{socket: socket} do
-    broadcast_from!(socket, "broadcast", %{"some" => "data"})
-    assert_push "broadcast", %{"some" => "data"}
+    test "rejects join without proper authentication" do
+      assert {:error, %{reason: "unauthorized"}} =
+        MailseekWeb.UserSocket
+        |> socket("user_id", %{})
+        |> subscribe_and_join(MailseekWeb.EmailsChannel, "emails:all", %{
+          "token" => "invalid_token"
+        })
+    end
   end
 end
