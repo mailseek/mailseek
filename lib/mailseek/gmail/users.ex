@@ -20,6 +20,15 @@ defmodule Mailseek.Gmail.Users do
     Repo.get_by!(GmailUser, user_id: user_id)
   end
 
+  def related_user_ids(user_id) do
+    user_id
+    |> get_connected_accounts()
+    |> Enum.map(fn account ->
+      account.user_id
+    end)
+    |> Enum.concat([user_id])
+  end
+
   def create_user(attrs) do
     %GmailUser{}
     |> GmailUser.changeset(attrs)

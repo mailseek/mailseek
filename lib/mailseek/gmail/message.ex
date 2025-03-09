@@ -14,6 +14,7 @@ defmodule Mailseek.Gmail.Message do
              :status,
              :reason,
              :model,
+             :sent_at,
              :temperature,
              :need_action,
              :category_id,
@@ -32,6 +33,7 @@ defmodule Mailseek.Gmail.Message do
     field :model, :string
     field :temperature, :float
     field :need_action, :boolean
+    field :sent_at, :naive_datetime
 
     belongs_to :category, Mailseek.User.UserCategory, foreign_key: :category_id
 
@@ -47,7 +49,8 @@ defmodule Mailseek.Gmail.Message do
       :message_id,
       :user_id,
       :summary,
-      :status
+      :status,
+      :sent_at
     ])
     |> validate_required([:subject, :from, :to, :message_id, :user_id, :status])
     |> unique_constraint([:message_id, :user_id])

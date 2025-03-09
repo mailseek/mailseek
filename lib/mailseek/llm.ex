@@ -4,7 +4,26 @@ defmodule Mailseek.LLM do
   alias Mailseek.LLM.Chain.Categorize
   alias Mailseek.LLM.Chain.AnalyzeUnsubscribePage
   alias Mailseek.LLM.Chain.AnalyzeUnsubscribeResult
+  alias Mailseek.LLM.Chain.FindUnsubscribeLink
   require Logger
+
+  def process(user_context = %{type: :find_unsubscribe_link}) do
+    user_context
+    |> FindUnsubscribeLink.chain()
+    |> LLMChain.run(mode: :while_needs_response)
+    |> case do
+      {:ok, updated_chain} ->
+        updated_chain
+        |> ChainResult.to_string()
+        |> FindUnsubscribeLink.build_response(user_context)
+
+      {:error, _chain, %LangChain.LangChainError{message: message}} when is_binary(message) ->
+        {:error, message}
+
+      {:error, _chain, error} ->
+        {:error, error}
+    end
+  end
 
   def process(user_context = %{type: :analyze_unsubscribe_result}) do
     user_context

@@ -4,7 +4,10 @@ defmodule Mailseek.Jobs.CategorizeEmail do
   alias Mailseek.LLM
   alias Mailseek.Gmail.Messages
   alias Mailseek.Gmail.Users
+  alias Mailseek.Client.Gmail
   alias Mailseek.Notifications
+  alias Mailseek.Repo
+  alias Mailseek.Gmail.TokenManager
   require Logger
 
   @model "deepseek-chat"
@@ -65,18 +68,26 @@ defmodule Mailseek.Jobs.CategorizeEmail do
       "Categorizing message #{message_id} with category #{category_id}: #{inspect(response)}"
     )
 
-    message =
-      message_id
-      |> Messages.get_message()
-      |> Messages.update_message(%{
-        category_id: category_id,
-        summary: Map.fetch!(response, "summary"),
-        need_action: Map.fetch!(response, "need_action"),
-        reason: Map.fetch!(response, "reason"),
-        status: "processed",
-        model: @model,
-        temperature: @temperature
-      })
+    {:ok, message} =
+      Repo.transaction(fn ->
+        if not is_nil(category_id) do
+          {:ok, token} = TokenManager.get_access_token(user_id)
+
+          {:ok, _} = Gmail.archive_message(token, message_id)
+        end
+
+        message_id
+        |> Messages.get_message()
+        |> Messages.update_message(%{
+          category_id: category_id,
+          summary: Map.fetch!(response, "summary"),
+          need_action: Map.fetch!(response, "need_action"),
+          reason: Map.fetch!(response, "reason"),
+          status: "processed",
+          model: @model,
+          temperature: @temperature
+        })
+      end)
 
     Notifications.notify("emails:all", {
       :email_processed,

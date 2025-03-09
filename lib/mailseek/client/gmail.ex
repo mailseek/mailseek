@@ -1,7 +1,7 @@
 defmodule Mailseek.Client.Gmail do
   alias GoogleApi.Gmail.V1.Api.Users
   alias GoogleApi.Gmail.V1.Connection
-
+  require Logger
   @topic "projects/mailseek/topics/mailseek-gmail-notifications"
 
   def set_watch(token) do
@@ -9,7 +9,6 @@ defmodule Mailseek.Client.Gmail do
 
     body = %{
       topicName: @topic,
-      # Only watch new inbox messages
       labelIds: ["INBOX"]
     }
 
@@ -20,6 +19,22 @@ defmodule Mailseek.Client.Gmail do
       {:error, reason} ->
         IO.inspect(reason, label: "Error")
         :error
+    end
+  end
+
+  def trash_message(token, message_id) do
+    conn = Connection.new(token)
+
+    case Users.gmail_users_messages_trash(conn, "me", message_id) do
+      {:ok, _response} ->
+        :ok
+
+      {:error, %Tesla.Env{status: 404}} ->
+        :ok
+
+      {:error, reason} ->
+        Logger.error("Error deleting message #{message_id}: #{inspect(reason)}")
+        {:error, reason}
     end
   end
 
@@ -49,6 +64,7 @@ defmodule Mailseek.Client.Gmail do
         {:ok,
          %{
            id: id,
+           sent_at_ms: msg.internalDate |> String.to_integer(),
            parts:
              msg.payload |> parse_message_part() |> Enum.reject(fn x -> x.body.size == 0 end),
            headers:
@@ -101,27 +117,6 @@ defmodule Mailseek.Client.Gmail do
             |> Enum.map(fn x -> x.message end)
         end)
     }
-  end
-
-  def list_messages(token) do
-    conn = Connection.new(token)
-
-    {:ok, %{messages: messages}} = Users.gmail_users_messages_list(conn, "me")
-
-    messages
-    |> Enum.take(10)
-    |> Enum.map(fn x ->
-      x.id
-    end)
-    |> Enum.take(2)
-    |> Enum.map(fn id ->
-      {:ok, msg} = Users.gmail_users_messages_get(conn, "me", id)
-
-      msg.payload
-      |> parse_message_part()
-    end)
-
-    :ok
   end
 
   defp parse_message_part(%{

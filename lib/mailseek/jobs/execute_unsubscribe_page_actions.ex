@@ -3,6 +3,7 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
 
   alias Mailseek.Jobs.AnalyzeUnsubscribeResult
   alias Mailseek.Jobs.UploadPageScreenshot
+  alias Mailseek.Gmail.Messages
 
   def perform(%Oban.Job{
         args: %{
@@ -18,13 +19,18 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
 
   defp do_perform(
          _user_id,
-         _message_id,
+         message_id,
          %{
            "action_needed" => false
          },
          _url
        ) do
     # No action needed
+
+    message_id
+    |> Messages.get_message()
+    |> Messages.update_message(%{status: "unsubscribed"})
+
     :ok
   end
 
@@ -40,13 +46,28 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
        ) do
     browser = Playwright.launch(:chromium)
 
+    batch_id = Ecto.UUID.generate()
+
     page =
       browser |> Playwright.Browser.new_page()
+
+    first_visit_path = "#{batch_id}_first_visit_screenshot.png"
+
+    Playwright.Page.screenshot(page, %{
+      path: first_visit_path
+    })
 
     page
     |> Playwright.Page.goto(url)
 
-    batch_id = Ecto.UUID.generate()
+    # Sleep to wait out slow pages and possible scraper checks
+    Process.sleep(10000)
+
+    second_visit_path = "#{batch_id}_second_visit_screenshot.png"
+
+    Playwright.Page.screenshot(page, %{
+      path: second_visit_path
+    })
 
     img_paths =
       actions
@@ -96,7 +117,8 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
     })
     |> Oban.insert!()
 
-    img_paths
+    [first_visit_path, second_visit_path]
+    |> Enum.concat(img_paths)
     |> Enum.concat([final_img_path])
     |> Enum.with_index()
     |> Enum.each(fn {path, index} ->
@@ -123,10 +145,8 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
        when action_item in ["check", "uncheck"] do
     locator =
       Playwright.Page.locator(page, selector)
-      |> dbg()
 
     Playwright.Locator.check(locator)
-    |> dbg()
   end
 
   defp click_element(page, %{
@@ -134,7 +154,6 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
          "selector" => selector
        }) do
     Playwright.Page.click(page, selector)
-    |> dbg()
   end
 
   defp fill_input(page, %{

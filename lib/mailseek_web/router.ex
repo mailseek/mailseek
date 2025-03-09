@@ -31,6 +31,8 @@ defmodule MailseekWeb.Router do
     pipe_through :api_authenticated
 
     get "/", MessageController, :index
+    post "/delete", MessageController, :delete
+    post "/unsubscribe", MessageController, :unsubscribe
     get "/:message_id", MessageController, :show
   end
 

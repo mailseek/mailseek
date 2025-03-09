@@ -31,8 +31,6 @@ defmodule Mailseek.Jobs.AnalyzeUnsubscribeResult do
         html: html
       })
 
-    dbg(response)
-
     user = Users.get_user(user_id)
 
     message = Messages.get_message(message_id)
@@ -47,6 +45,8 @@ defmodule Mailseek.Jobs.AnalyzeUnsubscribeResult do
         order: 999
       }
     })
+
+    Messages.update_message(message, %{status: "unsubscribed"})
 
     :ok
   end

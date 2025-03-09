@@ -32,6 +32,9 @@ defmodule Mailseek.Jobs.UnsubscribeFromEmails do
 
     path = "#{Ecto.UUID.generate()}.png"
 
+    # Sleep to wait out slow pages and possible scraper checks
+    Process.sleep(10000)
+
     Playwright.Page.screenshot(page, %{
       path: path
     })

@@ -23,7 +23,12 @@ defmodule MailseekWeb.EmailsChannel do
     {:noreply, socket}
   end
 
-  def handle_info({:email_processed, _, _}, socket) do
+  def handle_info(
+        {:email_updated, payload, user_id},
+        socket = %{assigns: %{user_id: socket_user_id}}
+      )
+      when socket_user_id == user_id do
+    broadcast(socket, "email_updated", %{payload: payload, user_id: user_id})
     {:noreply, socket}
   end
 
