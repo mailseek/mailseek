@@ -75,29 +75,25 @@ defmodule Mailseek.Jobs.UnsubscribeFromEmails do
 
     key = "m_#{message_id}/unsubscribe_page.png"
 
-    UploadPageScreenshot.new(
-      %{
-        "path" => path,
-        "key" => key,
-        "bucket" => "unsubscribe_flows",
-        "user_id" => user_id,
-        "message_id" => message_id,
-        "order" => 0
-      }
-    )
+    UploadPageScreenshot.new(%{
+      "path" => path,
+      "key" => key,
+      "bucket" => "unsubscribe_flows",
+      "user_id" => user_id,
+      "message_id" => message_id,
+      "order" => 0
+    })
     |> Oban.insert!()
 
-    AnalyzeUnsubscribePage.new(
-      %{
-        "provider" => "gmail",
-        "user_id" => user_id,
-        "message_id" => message_id,
-        "html" => html,
-        "page_title" => page_title,
-        "url" => unsubscribe_link,
-        "order" => 1
-      }
-    )
+    AnalyzeUnsubscribePage.new(%{
+      "provider" => "gmail",
+      "user_id" => user_id,
+      "message_id" => message_id,
+      "html" => html,
+      "page_title" => page_title,
+      "url" => unsubscribe_link,
+      "order" => 1
+    })
     |> Oban.insert!()
 
     :ok

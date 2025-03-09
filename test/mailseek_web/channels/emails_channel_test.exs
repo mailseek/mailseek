@@ -13,9 +13,11 @@ defmodule MailseekWeb.EmailsChannelTest do
 
   describe "join" do
     test "joins the channel successfully with user_id", %{user: user} do
-      {:ok, token, _} = AuthToken.sign(%{
-        "user_id" => user.user_id,
-      })
+      {:ok, token, _} =
+        AuthToken.sign(%{
+          "user_id" => user.user_id
+        })
+
       {:ok, _, socket} =
         MailseekWeb.UserSocket
         |> socket("user_id", %{user_id: user.user_id})
@@ -28,11 +30,11 @@ defmodule MailseekWeb.EmailsChannelTest do
 
     test "rejects join without proper authentication" do
       assert {:error, %{reason: "unauthorized"}} =
-        MailseekWeb.UserSocket
-        |> socket("user_id", %{})
-        |> subscribe_and_join(MailseekWeb.EmailsChannel, "emails:all", %{
-          "token" => "invalid_token"
-        })
+               MailseekWeb.UserSocket
+               |> socket("user_id", %{})
+               |> subscribe_and_join(MailseekWeb.EmailsChannel, "emails:all", %{
+                 "token" => "invalid_token"
+               })
     end
   end
 end

@@ -57,13 +57,14 @@ defmodule Mailseek.Gmail.MessagesTest do
         assert token == "mock_access_token"
         assert message_id == message.message_id
 
-        {:ok, %{
-          id: message.message_id,
-          parts: [
-            %{mime_type: "text/html", body: %{data: "PGgxPkhlbGxvIFdvcmxkPC9oMT4="}},
-            %{mime_type: "text/plain", body: %{data: "SGVsbG8gV29ybGQ="}}
-          ]
-        }}
+        {:ok,
+         %{
+           id: message.message_id,
+           parts: [
+             %{mime_type: "text/html", body: %{data: "PGgxPkhlbGxvIFdvcmxkPC9oMT4="}},
+             %{mime_type: "text/plain", body: %{data: "SGVsbG8gV29ybGQ="}}
+           ]
+         }}
       end)
 
       # Mock Gmail.decode_base64/1 for HTML
@@ -79,10 +80,10 @@ defmodule Mailseek.Gmail.MessagesTest do
       result = Messages.load_message(message.message_id, user.user_id)
 
       assert result == %{
-        id: message.message_id,
-        html: "<h1>Hello World</h1>",
-        text: "Hello World"
-      }
+               id: message.message_id,
+               html: "<h1>Hello World</h1>",
+               text: "Hello World"
+             }
     end
 
     test "handles missing html or text parts", %{user: user, messages: [message | _]} do
@@ -94,12 +95,13 @@ defmodule Mailseek.Gmail.MessagesTest do
 
       # Mock Gmail.get_message_by_id/2 with only text part
       expect(@gmail_client, :get_message_by_id, fn _token, _message_id ->
-        {:ok, %{
-          id: message.message_id,
-          parts: [
-            %{mime_type: "text/plain", body: %{data: "SGVsbG8gV29ybGQ="}}
-          ]
-        }}
+        {:ok,
+         %{
+           id: message.message_id,
+           parts: [
+             %{mime_type: "text/plain", body: %{data: "SGVsbG8gV29ybGQ="}}
+           ]
+         }}
       end)
 
       # Mock Gmail.decode_base64/1 for text
@@ -110,10 +112,10 @@ defmodule Mailseek.Gmail.MessagesTest do
       result = Messages.load_message(message.message_id, user.user_id)
 
       assert result == %{
-        id: message.message_id,
-        html: nil,
-        text: "Hello World"
-      }
+               id: message.message_id,
+               html: nil,
+               text: "Hello World"
+             }
     end
   end
 
@@ -138,7 +140,8 @@ defmodule Mailseek.Gmail.MessagesTest do
         user
       end)
 
-      expect(Mailseek.MockNotifications, :notify, times, fn "emails:all", {event, data, user_id} ->
+      expect(Mailseek.MockNotifications, :notify, times, fn "emails:all",
+                                                            {event, data, user_id} ->
         assert event == :email_updated
         assert %{message: %{}} = data
         assert user_id == user.user_id
@@ -158,7 +161,10 @@ defmodule Mailseek.Gmail.MessagesTest do
   end
 
   describe "unsubscribe_messages/2" do
-    test "marks messages for unsubscribing and schedules unsubscribe job", %{user: user, messages: messages} do
+    test "marks messages for unsubscribing and schedules unsubscribe job", %{
+      user: user,
+      messages: messages
+    } do
       message_ids = Enum.map(messages, & &1.message_id)
 
       times = length(messages)
@@ -177,7 +183,9 @@ defmodule Mailseek.Gmail.MessagesTest do
         assert user == user
         user
       end)
-      expect(Mailseek.MockNotifications, :notify, times, fn "emails:all", {event, data, user_id} ->
+
+      expect(Mailseek.MockNotifications, :notify, times, fn "emails:all",
+                                                            {event, data, user_id} ->
         assert event == :email_updated
         assert %{message: %{}} = data
         assert user_id == user.user_id
@@ -302,7 +310,8 @@ defmodule Mailseek.Gmail.MessagesTest do
       message3 = insert(:message, user_id: user.user_id, category_id: category2.id)
 
       # Create a deleted message that shouldn't be returned
-      deleted_message = insert(:message, user_id: user.user_id, category_id: category1.id, status: "deleted")
+      deleted_message =
+        insert(:message, user_id: user.user_id, category_id: category1.id, status: "deleted")
 
       # Test filtering by one category
       result1 = Messages.list_messages([user.user_id], [category1.id])

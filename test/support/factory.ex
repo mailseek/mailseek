@@ -24,7 +24,7 @@ defmodule Mailseek.Factory do
       to: sequence(:to, &"recipient-#{&1}@example.com"),
       reason: "reason",
       summary: "summary",
-      need_action: false,
+      need_action: false
     }
   end
 

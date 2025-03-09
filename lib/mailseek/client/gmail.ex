@@ -144,6 +144,7 @@ defmodule Mailseek.Client.Gmail do
 
   @impl true
   def decode_base64(nil), do: nil
+
   def decode_base64(data) do
     data
     |> String.replace("-", "+")
