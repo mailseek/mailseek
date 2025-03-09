@@ -59,6 +59,8 @@ defmodule Mailseek.Jobs.CategorizeEmail do
           category.id
       end
 
+    Logger.info("Categorizing message #{message_id} with category #{category_id}: #{inspect(response)}")
+
     message =
       message_id
       |> Messages.get_message()
