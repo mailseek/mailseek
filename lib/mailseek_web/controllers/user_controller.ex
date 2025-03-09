@@ -1,7 +1,8 @@
 defmodule MailseekWeb.UserController do
   use MailseekWeb, :controller
   alias Mailseek.Gmail.Users
-  alias Mailseek.Gmail
+
+  @gmail_impl Application.compile_env(:mailseek, :gmail, Mailseek.Gmail)
 
   def connected_accounts(conn = %{assigns: %{current_user: %{}}}, %{"user_id" => user_id}) do
     json(conn, %{connected_accounts: Users.get_connected_accounts(user_id)})
@@ -77,7 +78,7 @@ defmodule MailseekWeb.UserController do
   end
 
   defp maybe_initiate_user({:created, user = %{user_id: user_id}}) do
-    Gmail.initiate_user(user_id)
+    @gmail_impl.initiate_user(user_id)
     user
   end
 

@@ -43,4 +43,14 @@ defmodule Mailseek.Factory do
       expires_at: DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_unix()
     }
   end
+
+  def report_factory do
+    %Mailseek.User.Report{
+      type: "unsubscribe_flows",
+      user: build(:user),
+      status: "success",
+      summary: "summary",
+      payload: %{"order" => 1}
+    }
+  end
 end
