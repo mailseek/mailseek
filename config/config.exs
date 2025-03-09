@@ -10,7 +10,7 @@ import Config
 config :mailseek, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [gmail_message: 50, ai_processing: 50],
+  queues: [gmail_message: 20, ai_processing: 20, digest_email: 20, browser: 5, file_upload: 5],
   plugins: [
     {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7},
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(15)}

@@ -34,6 +34,12 @@ defmodule MailseekWeb.Router do
     get "/:message_id", MessageController, :show
   end
 
+  scope "/api/reports", MailseekWeb do
+    pipe_through :api_authenticated
+
+    get "/", MessageController, :reports
+  end
+
   scope "/api/users", MailseekWeb do
     pipe_through :api_authenticated
 

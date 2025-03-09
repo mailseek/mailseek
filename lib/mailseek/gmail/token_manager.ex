@@ -47,7 +47,9 @@ defmodule Mailseek.Gmail.TokenManager do
   defp do_sync_refresh_token(refresh_token) do
     case fetch_new_token(refresh_token) do
       {:ok, new_token, expires_in} ->
-        new_expires_at = DateTime.add(DateTime.utc_now(), expires_in, :second) |> DateTime.to_unix(:second)
+        new_expires_at =
+          DateTime.add(DateTime.utc_now(), expires_in, :second) |> DateTime.to_unix(:second)
+
         {:ok, new_token, new_expires_at}
 
       {:error, reason} ->
@@ -69,7 +71,6 @@ defmodule Mailseek.Gmail.TokenManager do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         data =
           Jason.decode!(body)
-          |> dbg()
 
         {:ok, data["access_token"], data["expires_in"]}
 

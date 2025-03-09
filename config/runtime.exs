@@ -36,6 +36,18 @@ config :langchain,
        :deepseek_api_key,
        System.get_env("DEEPSEEK_API_KEY") || raise("DEEPSEEK_API_KEY is not set")
 
+config :ex_aws,
+  debug_requests: true,
+  json_codec: Jason,
+  access_key_id: System.get_env("AWS_ACCESS_KEY_ID") || raise("AWS_ACCESS_KEY_ID is not set"),
+  secret_access_key:
+    System.get_env("AWS_SECRET_ACCESS_KEY") || raise("AWS_SECRET_ACCESS_KEY is not set")
+
+config :ex_aws, :s3,
+  scheme: "https://",
+  host: System.get_env("AWS_S3_HOST") || raise("AWS_S3_HOST is not set"),
+  region: System.get_env("AWS_REGION", "eu-central-1")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

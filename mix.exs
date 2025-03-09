@@ -39,7 +39,7 @@ defmodule Mailseek.MixProject do
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0.0"},
-      {:floki, ">= 0.30.0", only: :test},
+      {:floki, "~> 0.37.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
@@ -64,7 +64,13 @@ defmodule Mailseek.MixProject do
       {:igniter, "~> 0.5", only: [:dev]},
       {:oban_web, "~> 2.11"},
       {:httpoison, "~> 2.0"},
-      {:langchain, "~> 0.3.1"}
+      {:langchain, "~> 0.3.1"},
+      {:playwright, "~> 1.18.0-alpha.1"},
+      {:ex_aws, "~> 2.0"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:poison, "~> 3.0"},
+      {:sweet_xml, "~> 0.6.6"},
+      {:hackney, "~> 1.9"}
     ]
   end
 

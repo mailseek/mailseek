@@ -46,19 +46,31 @@ defmodule Mailseek.Client.Gmail do
 
     case Users.gmail_users_messages_get(conn, "me", id) do
       {:ok, msg} ->
-        {:ok, %{
-          id: id,
-          parts: msg.payload |> parse_message_part() |> Enum.reject(fn x -> x.body.size == 0 end),
-          headers:
-            msg.payload.headers
-            |> Enum.filter(fn x -> x.name in ["Subject", "From", "To", "Date", "Return-Path"] end)
-            |> Enum.map(fn x ->
-              %{
-                name: x.name,
-                value: x.value
-              }
-            end)
-        }}
+        {:ok,
+         %{
+           id: id,
+           parts:
+             msg.payload |> parse_message_part() |> Enum.reject(fn x -> x.body.size == 0 end),
+           headers:
+             msg.payload.headers
+             |> Enum.filter(fn x ->
+               x.name in [
+                 "Subject",
+                 "From",
+                 "To",
+                 "Date",
+                 "Return-Path",
+                 "List-Unsubscribe",
+                 "List-Unsubscribe-Post"
+               ]
+             end)
+             |> Enum.map(fn x ->
+               %{
+                 name: x.name,
+                 value: x.value
+               }
+             end)
+         }}
 
       {:error, %Tesla.Env{status: 404}} ->
         {:error, :not_found}
@@ -78,7 +90,9 @@ defmodule Mailseek.Client.Gmail do
       new_history_id: new_history_id,
       messages_added:
         Enum.flat_map(history || [], fn
-          %{messagesAdded: nil} -> []
+          %{messagesAdded: nil} ->
+            []
+
           %{messagesAdded: messages} ->
             messages
             |> Enum.reject(fn x ->

@@ -30,13 +30,15 @@ defmodule Mailseek.Jobs.CategorizeEmail do
        }) do
     categories = Users.categories_for_account(user_id)
 
-    primary_user = %{} =
+    primary_user =
+      %{} =
       user_id
       |> Users.get_user()
       |> Users.get_primary_account()
 
     {:ok, %{response: response}} =
       LLM.process(%{
+        type: :categorize,
         temperature: @temperature,
         model: @model,
         categories: Enum.map(categories, &%{id: &1.id, name: &1.name, definition: &1.definition}),
@@ -59,7 +61,9 @@ defmodule Mailseek.Jobs.CategorizeEmail do
           category.id
       end
 
-    Logger.info("Categorizing message #{message_id} with category #{category_id}: #{inspect(response)}")
+    Logger.info(
+      "Categorizing message #{message_id} with category #{category_id}: #{inspect(response)}"
+    )
 
     message =
       message_id

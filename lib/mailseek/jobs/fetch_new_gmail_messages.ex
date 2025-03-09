@@ -29,6 +29,7 @@ defmodule Mailseek.Jobs.FetchNewGmailMessages do
     end
 
     {:ok, token} = TokenManager.get_access_token(user_id)
+
     %{
       new_history_id: new_history_id,
       messages_added: messages_added
@@ -39,13 +40,16 @@ defmodule Mailseek.Jobs.FetchNewGmailMessages do
         Enum.each(messages_added, fn message ->
           Logger.info("Adding message #{message.id} to user #{user_id}")
 
-          ProcessGmailMessage.new(%{
-            "provider" => "gmail",
-            "user_id" => user_id,
-            "message_id" => message.id
-          }, meta: %{
-            type: "process_gmail_message"
-          })
+          ProcessGmailMessage.new(
+            %{
+              "provider" => "gmail",
+              "user_id" => user_id,
+              "message_id" => message.id
+            },
+            meta: %{
+              type: "process_gmail_message"
+            }
+          )
           |> Oban.insert!()
         end)
     end)

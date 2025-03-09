@@ -31,7 +31,6 @@ defmodule Mailseek.Gmail.Messages do
         %{body: %{data: data}} -> Gmail.decode_base64(data)
       end
 
-
     %{
       id: id,
       html: html,
@@ -52,7 +51,11 @@ defmodule Mailseek.Gmail.Messages do
   end
 
   def list_messages(user_ids, category_ids) do
-    Repo.all(from m in Message, where: m.user_id in ^user_ids and m.category_id in ^category_ids, order_by: [desc: :inserted_at])
+    Repo.all(
+      from m in Message,
+        where: m.user_id in ^user_ids and m.category_id in ^category_ids,
+        order_by: [desc: :inserted_at]
+    )
   end
 
   defp get_message_for_user(message_id, user_id) do
