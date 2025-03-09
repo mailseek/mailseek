@@ -61,3 +61,7 @@ jobs:
         AWS_S3_HOST: example.com
         MIX_ENV: test
         DATABASE_URL: postgres://postgres:postgres@localhost/mailseek_test
+        PGUSER: postgres
+        PGPASSWORD: postgres
+        PGDATABASE: mailseek_test
+        PGHOST: localhost
