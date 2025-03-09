@@ -8,7 +8,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
   require Logger
 
   @model "deepseek-chat"
-  @temperature 0.5
+  @temperature 1.5
 
   @impl true
   def perform(%{
