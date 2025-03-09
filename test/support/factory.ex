@@ -35,4 +35,12 @@ defmodule Mailseek.Factory do
       definition: sequence(:definition, &"Definition #{&1}")
     }
   end
+
+  def connection_factory do
+    %Mailseek.User.GmailUserConnection{
+      from_user: build(:user),
+      to_user: build(:user),
+      expires_at: DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_unix()
+    }
+  end
 end
