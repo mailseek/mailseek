@@ -44,6 +44,7 @@ defmodule Mailseek.LLM.Chain.Categorize do
     #{categories}
 
     If no categories are present, set category to "Other" and provide a reason for the categorization.
+    If no category is a good fit, set category to Uncategorized and provide a reason why it didnt fit into any of the categories.
 
     You should return result in JSON format:
     {
