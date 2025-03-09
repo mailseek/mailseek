@@ -42,3 +42,4 @@ config :mailseek, :token_manager, Mailseek.MockTokenManager
 config :mailseek, :notifications, Mailseek.MockNotifications
 config :mailseek, :users, Mailseek.MockUsers
 config :mailseek, :gmail, Mailseek.MockGmail
+config :mailseek, :llm, Mailseek.MockLLM

@@ -1,15 +1,15 @@
 defmodule Mailseek.Jobs.CategorizeEmail do
   use Oban.Worker, queue: :ai_processing, max_attempts: 5
 
-  alias Mailseek.LLM
   alias Mailseek.Gmail.Messages
   alias Mailseek.Gmail.Users
-  alias Mailseek.Client.Gmail
-  alias Mailseek.Notifications
   alias Mailseek.Repo
-  alias Mailseek.Gmail.TokenManager
   require Logger
 
+  @token_manager Application.compile_env(:mailseek, :token_manager, Mailseek.Gmail.TokenManager)
+  @llm Application.compile_env(:mailseek, :llm, Mailseek.LLM)
+  @notifications Application.compile_env(:mailseek, :notifications, Mailseek.Notifications)
+  @gmail_client Application.compile_env(:mailseek, :gmail_client, Mailseek.Client.Gmail)
   @model "deepseek-chat"
   @temperature 1.5
 
@@ -40,7 +40,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
       |> Users.get_primary_account()
 
     {:ok, %{response: response}} =
-      LLM.process(%{
+      @llm.process(%{
         type: :categorize,
         temperature: @temperature,
         model: @model,
@@ -71,9 +71,9 @@ defmodule Mailseek.Jobs.CategorizeEmail do
     {:ok, message} =
       Repo.transaction(fn ->
         if not is_nil(category_id) do
-          {:ok, token} = TokenManager.get_access_token(user_id)
+          {:ok, token} = @token_manager.get_access_token(user_id)
 
-          {:ok, _} = Gmail.archive_message(token, message_id)
+          {:ok, _} = @gmail_client.archive_message(token, message_id)
         end
 
         message_id
@@ -89,7 +89,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
         })
       end)
 
-    Notifications.notify("emails:all", {
+    @notifications.notify("emails:all", {
       :email_processed,
       %{
         message: message

@@ -1,11 +1,12 @@
 defmodule Mailseek.Jobs.ProcessGmailMessage do
   use Oban.Worker, queue: :gmail_message, max_attempts: 3
 
-  alias Mailseek.Client.Gmail
-  alias Mailseek.Gmail.TokenManager
   alias Mailseek.Gmail.Messages
   alias Mailseek.Jobs.CategorizeEmail
   require Logger
+
+  @gmail_client Application.compile_env(:mailseek, :gmail_client, Mailseek.Client.Gmail)
+  @token_manager Application.compile_env(:mailseek, :token_manager, Mailseek.Gmail.TokenManager)
 
   @impl Oban.Worker
   def perform(%Oban.Job{
@@ -15,8 +16,8 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
   end
 
   defp do_perform(user_id, message_id) do
-    {:ok, token} = TokenManager.get_access_token(user_id)
-    {:ok, message = %{}} = Gmail.get_message_by_id(token, message_id)
+    {:ok, token} = @token_manager.get_access_token(user_id)
+    {:ok, message = %{}} = @gmail_client.get_message_by_id(token, message_id)
 
     headers_map =
       message.headers
@@ -30,7 +31,7 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
       |> Enum.find(fn part -> part.mime_type == "text/plain" end)
       |> case do
         nil -> ""
-        part -> Gmail.decode_base64(part.body.data)
+        part -> @gmail_client.decode_base64(part.body.data)
       end
 
     %{from: from, to: to, subject: subject} =

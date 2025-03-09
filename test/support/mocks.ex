@@ -3,3 +3,5 @@ Mox.defmock(Mailseek.MockTokenManager, for: Mailseek.Gmail.TokenManagerBehaviour
 Mox.defmock(Mailseek.MockNotifications, for: Mailseek.NotificationsBehaviour)
 Mox.defmock(Mailseek.MockUsers, for: Mailseek.Gmail.UsersBehaviour)
 Mox.defmock(Mailseek.MockGmail, for: Mailseek.GmailBehaviour)
+Mox.defmock(Mailseek.MockLLM, for: Mailseek.LLMBehaviour)
+Mox.defmock(Mailseek.MockMessages, for: Mailseek.MessagesBehaviour)
