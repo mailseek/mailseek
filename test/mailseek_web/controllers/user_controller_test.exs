@@ -103,6 +103,32 @@ defmodule MailseekWeb.UserControllerTest do
       # Verify user was created
       assert Mailseek.Gmail.Users.get_user(user_id)
     end
+
+    test "upserts a user but doesnt initiate if already exists", %{conn: conn} do
+      # Mock Gmail.initiate_user/1
+      expect(Mailseek.MockGmail, :initiate_user, fn _user_id -> :ok end)
+
+      user_id = Ecto.UUID.generate()
+
+      params = %{
+        "user_id" => user_id,
+        "email" => "new@example.com",
+        "access_token" => "access_token",
+        "refresh_token" => "refresh_token",
+        "expires_at" => DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_unix()
+      }
+
+      conn = post(conn, ~p"/api/users/google", params)
+
+      assert %{} = json_response(conn, 200)
+
+      conn = post(conn, ~p"/api/users/google", params)
+
+      assert %{} = json_response(conn, 200)
+
+      # Verify user was created
+      assert Mailseek.Gmail.Users.get_user(user_id)
+    end
   end
 
   describe "connect/2" do
