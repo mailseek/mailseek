@@ -6,7 +6,7 @@ defmodule Mailseek.Jobs.FetchNewGmailMessages do
   alias Mailseek.Gmail.TokenManager
   alias Mailseek.Gmail.Users
   alias Mailseek.Jobs.ProcessGmailMessage
-  @interval 60
+  @interval 30
 
   require Logger
 
