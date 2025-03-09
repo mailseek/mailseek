@@ -34,17 +34,15 @@ defmodule Mailseek.Jobs.ProcessGmailMessage do
       end
 
     %{from: from, to: to, subject: subject} =
-      Messages.create_message(
-        %{
-          message_id: message_id,
-          user_id: user_id,
-          subject: Map.fetch!(headers_map, "Subject"),
-          from: Map.fetch!(headers_map, "From"),
-          to: Map.fetch!(headers_map, "To"),
-          sent_at: DateTime.from_unix!(message.sent_at_ms, :millisecond),
-          status: "new"
-        }
-      )
+      Messages.create_message(%{
+        message_id: message_id,
+        user_id: user_id,
+        subject: Map.fetch!(headers_map, "Subject"),
+        from: Map.fetch!(headers_map, "From"),
+        to: Map.fetch!(headers_map, "To"),
+        sent_at: DateTime.from_unix!(message.sent_at_ms, :millisecond),
+        status: "new"
+      })
 
     CategorizeEmail.new(
       %{
