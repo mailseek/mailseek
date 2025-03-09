@@ -38,6 +38,15 @@ ENV MIX_ENV="prod"
 COPY mix.exs mix.lock ./
 RUN mix deps.get --only $MIX_ENV
 RUN mkdir config
+RUN apt-get update -y && \
+    apt-get install -y build-essential git curl \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+# Check versions
+RUN node -v && npm -v
+RUN mix playwright.install
 
 # copy compile-time config files before we compile dependencies
 # to ensure any relevant config change will trigger the dependencies
