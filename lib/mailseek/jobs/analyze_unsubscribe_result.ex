@@ -50,4 +50,7 @@ defmodule Mailseek.Jobs.AnalyzeUnsubscribeResult do
 
     :ok
   end
+
+  @impl Oban.Worker
+  def timeout(_job), do: :timer.seconds(60)
 end

@@ -97,4 +97,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
       primary_user.user_id
     })
   end
+
+  @impl Oban.Worker
+  def timeout(_job), do: :timer.seconds(60)
 end

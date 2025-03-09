@@ -5,6 +5,7 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
   alias Mailseek.Jobs.UploadPageScreenshot
   alias Mailseek.Gmail.Messages
 
+  @impl true
   def perform(%Oban.Job{
         args: %{
           "provider" => "gmail",
@@ -162,6 +163,8 @@ defmodule Mailseek.Jobs.ExecuteUnsubscribePageActions do
          "value" => value
        }) do
     Playwright.Page.fill(page, selector, value)
-    |> dbg()
   end
+
+  @impl Oban.Worker
+  def timeout(_job), do: :timer.seconds(120)
 end
