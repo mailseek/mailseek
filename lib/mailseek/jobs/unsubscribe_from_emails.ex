@@ -47,6 +47,9 @@ defmodule Mailseek.Jobs.UnsubscribeFromEmails do
       path: path
     })
 
+    # Get HTML of the page excluding styles, scripts, and noscript elements
+    # Also minify it to reduce the size of the payload
+    # Since there is a limit on context length in LLMs
     html =
       Playwright.Page.evaluate(page, """
         (function() {
@@ -56,18 +59,31 @@ defmodule Mailseek.Jobs.UnsubscribeFromEmails do
           // Remove all style elements
           const styles = clone.querySelectorAll('style');
           styles.forEach(style => style.remove());
+          // Remove the entire head element
+          const head = clone.querySelector('head');
+          if (head) {
+            head.remove();
+          }
 
-          // Remove all script elements
+          // Remove all script elements (including text/javascript)
           const scripts = clone.querySelectorAll('script');
           scripts.forEach(script => script.remove());
+
+          // Also remove noscript elements as they might contain fallback content
+          const noscripts = clone.querySelectorAll('noscript');
+          noscripts.forEach(noscript => noscript.remove());
 
           // Remove all link elements with rel="stylesheet"
           const styleLinks = clone.querySelectorAll('link[rel="stylesheet"]');
           styleLinks.forEach(link => link.remove());
 
-          return clone.outerHTML;
+          // Minify HTML by removing all whitespace between tags and unnecessary attributes
+          return clone.outerHTML
         })()
       """)
+      |> String.trim()
+      |> String.replace("\n", "")
+      |> String.replace(~r/>[\s\n\r]+</m, "><")
 
     Process.sleep(1000)
 
