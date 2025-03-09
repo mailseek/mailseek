@@ -1,0 +1,63 @@
+name: Elixir Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mailseek_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.17.3' # Use your Elixir version
+        otp-version: '27.3'      # Use your OTP version
+
+    - name: Restore dependencies cache
+      uses: actions/cache@v3
+      with:
+        path: deps
+        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+        restore-keys: ${{ runner.os }}-mix-
+
+    - name: Install dependencies
+      run: mix deps.get
+
+    - name: Compile
+      run: mix compile
+
+    - name: Check formatting
+      run: mix format --check-formatted
+
+    - name: Run tests
+      run: mix test
+      env:
+        DEEPSEEK_API_KEY: 123
+        SOCKET_SECRET: 123
+        AWS_ACCESS_KEY_ID: 123
+        AWS_SECRET_ACCESS_KEY: 123
+        AWS_S3_HOST: example.com
+        MIX_ENV: test
+        DATABASE_URL: postgres://postgres:postgres@localhost/mailseek_test
