@@ -1,4 +1,4 @@
-defmodule MailseekWeb.GmailController do
+defmodule MailseekWeb.UserController do
   use MailseekWeb, :controller
   alias Mailseek.Gmail.Users
   alias Mailseek.Gmail

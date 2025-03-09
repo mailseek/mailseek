@@ -39,17 +39,17 @@ defmodule MailseekWeb.Router do
   scope "/api/reports", MailseekWeb do
     pipe_through :api_authenticated
 
-    get "/", MessageController, :reports
+    get "/", ReportController, :index
   end
 
   scope "/api/users", MailseekWeb do
     pipe_through :api_authenticated
 
-    get "/categories", GmailController, :list_categories
-    post "/categories", GmailController, :create_category
-    get "/connected_accounts", GmailController, :connected_accounts
-    post "/google", GmailController, :create_user
-    post "/google/connect", GmailController, :connect
+    get "/categories", UserController, :list_categories
+    post "/categories", UserController, :create_category
+    get "/connected_accounts", UserController, :connected_accounts
+    post "/google", UserController, :create_user
+    post "/google/connect", UserController, :connect
   end
 
   scope "/" do
