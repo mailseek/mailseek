@@ -3,6 +3,7 @@ defmodule Mailseek.Gmail.Users do
   alias Mailseek.User.UserCategory
   alias Mailseek.User.GmailUserConnection
   alias Mailseek.Repo
+  @behaviour Mailseek.Gmail.UsersBehaviour
 
   import Ecto.Query
 

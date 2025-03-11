@@ -17,7 +17,7 @@ defmodule Mailseek.Gmail.UserCategories do
 
     items
     |> Enum.map(fn item ->
-      %Settings{user_id: id, category_id: String.to_integer(category_id)}
+      %Settings{user_id: id, category_id: input_category_id(category_id)}
       |> Settings.changeset(item)
       |> Repo.insert!(
         on_conflict: {:replace, [:value]},
@@ -59,5 +59,12 @@ defmodule Mailseek.Gmail.UserCategories do
       end)
 
     Map.put(settings, :items, new_items)
+  end
+
+  defp input_category_id(category_id) do
+    case category_id do
+      id when is_integer(id) -> id
+      id when is_binary(id) -> String.to_integer(id)
+    end
   end
 end
