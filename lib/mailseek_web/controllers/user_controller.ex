@@ -1,7 +1,7 @@
 defmodule MailseekWeb.UserController do
   use MailseekWeb, :controller
   alias Mailseek.Gmail.Users
-
+  alias Mailseek.Gmail.UserCategories
   @gmail_impl Application.compile_env(:mailseek, :gmail, Mailseek.Gmail)
 
   def connected_accounts(conn = %{assigns: %{current_user: %{}}}, %{"user_id" => user_id}) do
@@ -10,6 +10,22 @@ defmodule MailseekWeb.UserController do
 
   def list_categories(conn = %{assigns: %{current_user: %{}}}, %{"user_id" => user_id}) do
     json(conn, %{categories: Users.get_categories(user_id)})
+  end
+
+  def save_category_settings(conn = %{assigns: %{current_user: %{}}}, %{
+        "user_id" => user_id,
+        "category_id" => category_id,
+        "settings" => %{"items" => items}
+      }) do
+    UserCategories.save_category_settings(user_id, category_id, items)
+    json(conn, %{settings: UserCategories.get_category_settings(user_id, category_id)})
+  end
+
+  def get_category_settings(conn = %{assigns: %{current_user: %{}}}, %{
+        "user_id" => user_id,
+        "category_id" => category_id
+      }) do
+    json(conn, %{settings: UserCategories.get_category_settings(user_id, category_id)})
   end
 
   def create_category(

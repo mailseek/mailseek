@@ -45,6 +45,8 @@ defmodule MailseekWeb.Router do
   scope "/api/users", MailseekWeb do
     pipe_through :api_authenticated
 
+    get "/:user_id/categories/:category_id/settings", UserController, :get_category_settings
+    post "/:user_id/categories/:category_id/settings", UserController, :save_category_settings
     get "/categories", UserController, :list_categories
     post "/categories", UserController, :create_category
     get "/connected_accounts", UserController, :connected_accounts

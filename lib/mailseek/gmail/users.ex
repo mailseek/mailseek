@@ -1,6 +1,7 @@
 defmodule Mailseek.Gmail.Users do
   alias Mailseek.User.Gmail, as: GmailUser
   alias Mailseek.User.UserCategory
+  alias Mailseek.User.UserCategory.Settings
   alias Mailseek.User.GmailUserConnection
   alias Mailseek.Repo
 
