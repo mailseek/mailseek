@@ -5,12 +5,12 @@ defmodule MailseekWeb.Plug.BasicAuth do
     opts
   end
 
-  def call(conn, opts) do
+  def call(conn, _opts) do
     username =
-      Keyword.fetch!(opts, :username)
+      Application.fetch_env!(:mailseek, :admin_username)
 
     password =
-      Keyword.fetch!(opts, :password)
+      Application.fetch_env!(:mailseek, :admin_password)
 
     case get_auth_header(conn) do
       {"Basic " <> encoded_credentials} ->

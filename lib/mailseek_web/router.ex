@@ -22,9 +22,7 @@ defmodule MailseekWeb.Router do
   end
 
   pipeline :admin_auth do
-    plug MailseekWeb.Plug.BasicAuth,
-      username: Application.fetch_env!(:mailseek, :admin_username),
-      password: Application.fetch_env!(:mailseek, :admin_password)
+    plug MailseekWeb.Plug.BasicAuth
   end
 
   scope "/", MailseekWeb do
