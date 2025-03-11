@@ -6,7 +6,7 @@ defmodule Mailseek.User.UserCategory.Settings do
   @derive {Jason.Encoder, only: [:id, :key, :value, :category_id, :user_id]}
   schema "users_categories_settings" do
     belongs_to :user, Mailseek.User.Gmail
-    belongs_to :category, Mailseek.Message.Category
+    belongs_to :category, Mailseek.User.UserCategory
     field :key, :string
     field :value, :map
 

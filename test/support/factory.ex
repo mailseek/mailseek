@@ -36,6 +36,17 @@ defmodule Mailseek.Factory do
     }
   end
 
+  def category_setting_factory do
+    %Mailseek.User.UserCategory.Settings{
+      user: build(:user),
+      key: "archive_categorized_emails",
+      value: %{
+        "type" => "boolean",
+        "value" => true
+      }
+    }
+  end
+
   def connection_factory do
     %Mailseek.User.GmailUserConnection{
       from_user: build(:user),

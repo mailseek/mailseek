@@ -3,6 +3,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
 
   alias Mailseek.Gmail.Messages
   alias Mailseek.Gmail.Users
+  alias Mailseek.Gmail.UserCategories
   alias Mailseek.Repo
   require Logger
 
@@ -71,9 +72,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
     {:ok, message} =
       Repo.transaction(fn ->
         if not is_nil(category_id) do
-          {:ok, token} = @token_manager.get_access_token(user_id)
-
-          {:ok, _} = @gmail_client.archive_message(token, message_id)
+          maybe_archive_message(primary_user, user_id, category_id, message_id)
         end
 
         message_id
@@ -100,4 +99,24 @@ defmodule Mailseek.Jobs.CategorizeEmail do
 
   @impl Oban.Worker
   def timeout(_job), do: :timer.seconds(60)
+
+  defp maybe_archive_message(primary_user, user_id, category_id, message_id) do
+    primary_user.user_id
+    |> UserCategories.get_category_settings(category_id)
+    |> Map.fetch!(:items)
+    |> Enum.find(fn %{key: key} -> key == "archive_categorized_emails" end)
+    |> Map.fetch!(:value)
+    |> Map.fetch!("value")
+    |> case do
+      false ->
+        :ok
+
+      true ->
+        {:ok, token} = @token_manager.get_access_token(user_id)
+
+        {:ok, _} = @gmail_client.archive_message(token, message_id)
+
+        :ok
+    end
+  end
 end
