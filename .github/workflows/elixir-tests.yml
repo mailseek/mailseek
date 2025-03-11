@@ -54,6 +54,8 @@ jobs:
     - name: Run tests
       run: mix test
       env:
+        ADMIN_USERNAME: admin
+        ADMIN_PASSWORD: admin
         POSTGRES_HOSTNAME: localhost
         DEEPSEEK_API_KEY: 123
         SOCKET_SECRET: 123

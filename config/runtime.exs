@@ -25,6 +25,14 @@ config :mailseek,
        System.get_env("SOCKET_SECRET") || raise("SOCKET_SECRET is not set")
 
 config :mailseek,
+       :admin_username,
+       System.get_env("ADMIN_USERNAME") || raise("ADMIN_USERNAME is not set")
+
+config :mailseek,
+       :admin_password,
+       System.get_env("ADMIN_PASSWORD") || raise("ADMIN_PASSWORD is not set")
+
+config :mailseek,
        :google_client_id,
        System.get_env("GOOGLE_CLIENT_ID") || raise("GOOGLE_CLIENT_ID is not set")
 

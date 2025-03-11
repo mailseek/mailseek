@@ -72,7 +72,8 @@ defmodule Mailseek.MixProject do
       {:sweet_xml, "~> 0.6.6"},
       {:hackney, "~> 1.9"},
       {:mox, "~> 1.2"},
-      {:ex_machina, "~> 2.8"}
+      {:ex_machina, "~> 2.8"},
+      {:plug, "~> 1.14"}
     ]
   end
 

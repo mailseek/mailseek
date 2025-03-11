@@ -24,6 +24,10 @@ config :mailseek, MailseekWeb.Endpoint,
 # In test we don't send emails
 config :mailseek, Mailseek.Mailer, adapter: Swoosh.Adapters.Test
 
+# Default admin credentials for testing
+config :mailseek, :admin_username, "admin"
+config :mailseek, :admin_password, "admin"
+
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false
 

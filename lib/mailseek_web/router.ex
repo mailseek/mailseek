@@ -21,6 +21,12 @@ defmodule MailseekWeb.Router do
     plug MailseekWeb.Plug.VerifyAuthenticated
   end
 
+  pipeline :admin_auth do
+    plug MailseekWeb.Plug.BasicAuth,
+      username: Application.fetch_env!(:mailseek, :admin_username),
+      password: Application.fetch_env!(:mailseek, :admin_password)
+  end
+
   scope "/", MailseekWeb do
     pipe_through :browser
 
@@ -55,7 +61,7 @@ defmodule MailseekWeb.Router do
   end
 
   scope "/" do
-    pipe_through :browser
+    pipe_through [:browser, :admin_auth]
 
     oban_dashboard("/oban")
   end

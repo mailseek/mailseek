@@ -65,6 +65,10 @@ config :mailseek, MailseekWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :mailseek, dev_routes: true
 
+# Default admin credentials for development
+config :mailseek, :admin_username, "admin"
+config :mailseek, :admin_password, "admin"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
