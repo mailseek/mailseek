@@ -12,7 +12,7 @@ defmodule Mailseek.User.Gmail do
     field :email, :string
     field :user_id, :binary_id
 
-    has_many :categories, Mailseek.User.UserCategory, foreign_key: :user_id
+    has_many :categories, Mailseek.Message.Category, foreign_key: :user_id
     has_many :connected_accounts, Mailseek.User.GmailUserConnection, foreign_key: :from_user_id
     timestamps()
   end
