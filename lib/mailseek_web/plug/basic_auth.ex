@@ -8,13 +8,11 @@ defmodule MailseekWeb.Plug.BasicAuth do
   def call(conn, opts) do
     username =
       Keyword.fetch!(opts, :username)
-      |> dbg()
 
     password =
       Keyword.fetch!(opts, :password)
-      |> dbg()
 
-    case get_auth_header(conn) |> dbg() do
+    case get_auth_header(conn) do
       {"Basic " <> encoded_credentials} ->
         case Base.decode64(encoded_credentials) do
           {:ok, credentials} ->
