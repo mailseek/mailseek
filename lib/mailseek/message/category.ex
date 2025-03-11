@@ -1,6 +1,5 @@
 defmodule Mailseek.Message.Category do
   use Ecto.Schema
-  import Ecto.Changeset
 
   @derive {Jason.Encoder, only: [:id, :name, :definition, :message_count, :user_id]}
   schema "v_user_categories" do
