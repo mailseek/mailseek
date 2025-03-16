@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for mailseek on 2025-03-08T22:11:41+01:00
+# fly.toml app configuration file generated for inbox-zero on 2025-03-16T19:55:47+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'mailseek'
+app = 'inbox-zero'
 primary_region = 'ams'
 kill_signal = 'SIGTERM'
 
@@ -13,7 +13,7 @@ kill_signal = 'SIGTERM'
   release_command = '/app/bin/migrate'
 
 [env]
-  PHX_HOST = 'mailseek.fly.dev'
+  PHX_HOST = 'inbox-zero.fly.dev'
   PORT = '8080'
 
 [http_service]
@@ -30,6 +30,6 @@ kill_signal = 'SIGTERM'
     soft_limit = 1000
 
 [[vm]]
-  memory = '4gb'
+  memory = '2gb'
   cpu_kind = 'shared'
   cpus = 2

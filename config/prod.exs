@@ -7,7 +7,12 @@ import Config
 # before starting your production server.
 config :mailseek, MailseekWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
-  check_origin: ["https://mailseek.fly.dev", "https://mailseek-web.fly.dev"]
+  check_origin: [
+    "https://mailgpt-web.fly.dev",
+    "https://mailgpt.fly.dev",
+    "https://inbox-zero.fly.dev",
+    "https://inbox-zero-web.fly.dev"
+  ]
 
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Mailseek.Finch
