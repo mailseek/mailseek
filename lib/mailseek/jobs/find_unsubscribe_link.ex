@@ -6,7 +6,7 @@ defmodule Mailseek.Jobs.FindUnsubscribeLink do
   alias Mailseek.LLM
   require Logger
 
-  @model "deepseek-chat"
+  @model "gpt-4o"
   @temperature 0.5
 
   @impl Oban.Worker

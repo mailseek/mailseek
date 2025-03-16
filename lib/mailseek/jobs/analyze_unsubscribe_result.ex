@@ -6,7 +6,7 @@ defmodule Mailseek.Jobs.AnalyzeUnsubscribeResult do
   alias Mailseek.Gmail.Users
   alias Mailseek.Gmail.Messages
 
-  @model "deepseek-chat"
+  @model "gpt-4o"
   @temperature 1.5
 
   @impl Oban.Worker

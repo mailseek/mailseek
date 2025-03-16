@@ -8,7 +8,7 @@ defmodule Mailseek.Jobs.AnalyzeUnsubscribePage do
   alias Mailseek.Gmail.Messages
   require Logger
 
-  @model "deepseek-chat"
+  @model "gpt-4o"
   @temperature 1.5
 
   @impl Oban.Worker

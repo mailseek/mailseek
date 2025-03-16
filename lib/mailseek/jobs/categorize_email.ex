@@ -11,7 +11,7 @@ defmodule Mailseek.Jobs.CategorizeEmail do
   @llm Application.compile_env(:mailseek, :llm, Mailseek.LLM)
   @notifications Application.compile_env(:mailseek, :notifications, Mailseek.Notifications)
   @gmail_client Application.compile_env(:mailseek, :gmail_client, Mailseek.Client.Gmail)
-  @model "deepseek-chat"
+  @model "gpt-4o"
   @temperature 1.5
 
   @impl true

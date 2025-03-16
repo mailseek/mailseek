@@ -42,7 +42,10 @@ config :mailseek,
 
 config :langchain,
        :deepseek_api_key,
-       System.get_env("DEEPSEEK_API_KEY") || raise("DEEPSEEK_API_KEY is not set")
+       System.get_env("DEEPSEEK_API_KEY")
+
+config :langchain, openai_key: System.get_env("OPENAI_API_KEY")
+config :langchain, openai_org_id: System.get_env("OPENAI_ORG_ID")
 
 config :ex_aws,
   debug_requests: true,
